@@ -11,7 +11,7 @@ Dưới đây là bản kế hoạch hoàn chỉnh để phát triển ứng d�
    - Viết các hàm Python để thực hiện các bước tiền xử lý và làm sạch dữ liệu tương tự như báo cáo giữa kỳ.
    - Sử dụng các thư viện xử lý dữ liệu như Pandas, NumPy để thao tác và xử lý dữ liệu hiệu quả.
    - Áp dụng các kỹ thuật làm sạch dữ liệu như loại bỏ dữ liệu trùng lặp, xử lý giá trị thiếu, chuẩn hóa văn bản, v.v.
-   - Quá trình này sẽ được thực hiện tự động sau khi hoàn thành quá trình 1, hoặc khi người dùng nhấn nút "Cập nhật dữ liệu" trên giao diện.
+   - Quá trình này sẽ được thực hiện khi người dùng nhấn nút "Cập nhật dữ liệu" trên giao diện.
 
 3. Phân tích và trực quan hóa dữ liệu sản phẩm
    - Sử dụng các thư viện phân tích dữ liệu như Pandas, Matplotlib, Seaborn để thực hiện các phân tích thống kê và trực quan hóa.
@@ -20,12 +20,8 @@ Dưới đây là bản kế hoạch hoàn chỉnh để phát triển ứng d�
    - Quá trình này sẽ được thực hiện khi người dùng truy cập vào trang "Sản phẩm" hoặc khi người dùng tương tác với các điều khiển lọc và chọn dữ liệu trên giao diện.
 
 4. Phân tích cảm xúc từ dữ liệu đánh giá
-   - Sử dụng thư viện xử lý ngôn ngữ tự nhiên như NLTK, spaCy để tiền xử lý và phân tích văn bản đánh giá.
-   - Xây dựng mô hình phân loại cảm xúc (tích cực, tiêu cực, trung lập) sử dụng các kỹ thuật học máy như Naive Bayes, SVM, LSTM.
-   - Trích xuất các từ khóa, cụm từ quan trọng liên quan đến cảm xúc bằng kỹ thuật TF-IDF hoặc Word2Vec.
-   - Tạo biểu đồ thể hiện tỷ lệ cảm xúc, so sánh giữa các thương hiệu, sản phẩm.
-   - Quá trình này sẽ được thực hiện khi người dùng truy cập vào trang "Đánh giá" hoặc khi người dùng tương tác với các điều khiển lọc và chọn dữ liệu trên giao diện.
-
+   - Mấy bạn làm phần này tự viết vào nhé
+   
 5. Xây dựng ứng dụng Streamlit
    - Thiết kế giao diện ứng dụng với Streamlit, tạo các trang (pages) cho từng chức năng chính.
    - Trang chủ: Giới thiệu về ứng dụng, hướng dẫn sử dụng, và liên kết đến các trang khác.
@@ -39,11 +35,6 @@ Dưới đây là bản kế hoạch hoàn chỉnh để phát triển ứng d�
      - Sử dụng thẻ (tags), bảng, và văn bản để trình bày các nhận định và đề xuất một cách rõ ràng, dễ hiểu.
      - Cho phép người dùng lựa chọn và xem các nhận định, đề xuất theo chủ đề hoặc lĩnh vực cụ thể.
    - Kết quả từ quá trình 3 và 4 sẽ được cập nhật tự động lên các trang tương ứng khi có dữ liệu mới hoặc khi người dùng tương tác với các điều khiển lọc và chọn dữ liệu.
-
-6. Triển khai và kiểm thử
-   - Kiểm tra và tối ưu hóa hiệu suất của ứng dụng, đảm bảo thời gian phản hồi nhanh và ổn định.
-   - Thực hiện kiểm thử chức năng và giao diện người dùng, sửa lỗi nếu có.
-   - Triển khai ứng dụng lên một nền tảng đám mây như Heroku, AWS, hoặc Google Cloud để người dùng có thể truy cập và sử dụng dễ dàng.
 
 ```mermaid
 graph TD
@@ -59,5 +50,3 @@ graph TD
     G -->|Nhấn nút "Cập nhật dữ liệu"| B
 
 ```
-
-Với kế hoạch phát triển và sơ đồ quá trình như trên, ứng dụng sẽ có thể thu thập và cập nhật dữ liệu một cách tự động, đồng thời cung cấp cho người dùng khả năng tương tác và khám phá kết quả phân tích một cách linh hoạt thông qua giao diện Streamlit thân thiện. Điều này sẽ giúp ứng dụng đáp ứng tốt yêu cầu của đồ án cuối kỳ và mang lại trải nghiệm người dùng tối ưu.
