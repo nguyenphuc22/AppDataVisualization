@@ -1,9 +1,9 @@
 class StringManager:
     _instance = None
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls):
         if not cls._instance:
-            cls._instance = super(StringManager, cls).__new__(cls, *args, **kwargs)
+            cls._instance = super(StringManager, cls).__new__(cls)
         return cls._instance
 
     def __init__(self):
@@ -30,3 +30,9 @@ class StringManager:
 
     def set_string(self, key, value):
         self.strings[key] = value
+
+    @classmethod
+    def get_instance(cls):
+        if not cls._instance:
+            cls._instance = cls()
+        return cls._instance

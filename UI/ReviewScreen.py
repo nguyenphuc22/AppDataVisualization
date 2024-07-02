@@ -1,7 +1,6 @@
 import streamlit as st
 from String import StringManager
 
-
-def reviewScreen():
-    st.title(StringManager.get_string("review_title"))
-    st.write(StringManager.get_string("review_page_message"))
+def reviewScreen(strings: StringManager):
+    st.title(strings.get_string(key="review_title"))
+    st.write(strings.get_string(key="review_page_message"))

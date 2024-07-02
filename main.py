@@ -9,7 +9,7 @@ from UI.ReviewScreen import reviewScreen
 from UI.VisualizationScreen import visualizationScreen
 
 # Create an instance of StringManager
-strings = StringManager()
+strings = StringManager.get_instance()
 productManager = ProductManager.get_instance()
 reviewManager = ReviewManager.get_instance()
 
@@ -31,7 +31,7 @@ def main():
         elif product_menu == strings.get_string("hypothesis_title"):
             hypothesisScreen(strings)
     elif menu == strings.get_string("review_title"):
-        reviewScreen()
+        reviewScreen(strings)
 
 if __name__ == "__main__":
     productManager.read_data("Data/filtered_data_product.xlsx")

@@ -1,5 +1,4 @@
 import streamlit as st
-
 from DataManager.ProductManager import ProductManager
 from String import StringManager
 
