@@ -1,41 +1,39 @@
 import streamlit as st
-from streamlit_option_menu import option_menu
 
+from DataManager.ProductManager import ProductManager
+from DataManager.ReviewManager import ReviewManager
+from String import StringManager
+from UI.HomeScreen import homeScreen
+from UI.HypothesisScreen import hypothesisScreen
+from UI.ReviewScreen import reviewScreen
+from UI.VisualizationScreen import visualizationScreen
 
-def home():
-    st.title("Trang chủ")
-    st.write("Chào mừng đến với ứng dụng của chúng tôi!")
-
-
-def product():
-    st.title("Sản phẩm")
-    st.write("Đây là trang sản phẩm của chúng tôi.")
-    # Thêm nội dung về sản phẩm ở đây
-
-
-def review():
-    st.title("Đánh giá")
-    st.write("Đây là trang đánh giá của chúng tôi.")
-    # Thêm form đánh giá hoặc hiển thị đánh giá ở đây
-
+# Create an instance of StringManager
+strings = StringManager()
+productManager = ProductManager.get_instance()
+reviewManager = ReviewManager.get_instance()
 
 def main():
-    with st.sidebar:
-        selected = option_menu(
-            menu_title="Danh Mục",
-            options=["Trang chủ", "Sản phẩm", "Đánh giá"],
-            icons=["house", "box", "star"],
-            menu_icon="cast",
-            default_index=0,
+    menu = st.sidebar.selectbox(
+        strings.get_string("menu_title"),
+        strings.get_string("menu_options")
+    )
+
+    if menu == strings.get_string("home_title"):
+        homeScreen(strings)
+    elif menu == strings.get_string("product_title"):
+        product_menu = st.sidebar.selectbox(
+            strings.get_string("product_title"),
+            strings.get_string("product_options")
         )
-
-    if selected == "Trang chủ":
-        home()
-    elif selected == "Sản phẩm":
-        product()
-    elif selected == "Đánh giá":
-        review()
-
+        if product_menu == strings.get_string("data_visualization_title"):
+            visualizationScreen(strings)
+        elif product_menu == strings.get_string("hypothesis_title"):
+            hypothesisScreen(strings)
+    elif menu == strings.get_string("review_title"):
+        reviewScreen()
 
 if __name__ == "__main__":
+    productManager.read_data("Data/filtered_data_product.xlsx")
+    reviewManager.read_data("Data/filtered_data_review.xlsx")
     main()
