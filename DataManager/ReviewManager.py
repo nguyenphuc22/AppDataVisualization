@@ -2,6 +2,7 @@ from DataManager.DataManager import AbstractDataManager
 
 
 class ReviewManager(AbstractDataManager):
+    _instance = None
     def __init__(self):
         super().__init__()
         self.get_data = None  # or initialize it with some value
