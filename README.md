@@ -1,7 +1,7 @@
 # AppDataVisualization
 
 ## Cài đặt môi trường
-- steamlit run main.py
+- streamlit run main.py
 
 ## Kế hoạch
 Kế hoạch thực hiện ứng dụng "Data Visualization" cho dự án cuối kỳ môn học "Xử lý dữ liệu thông minh" của nhóm 5 người.
