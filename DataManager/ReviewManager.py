@@ -14,6 +14,7 @@ class ReviewManager(AbstractDataManager):
 
     def preprocess_data(self, data):
         # Code Tiền Sử Lý Chung Cho Review tại đây nhé
+        # Todo: Viên - Nhi code tiền xử lý nhé
         return data
 
     def get_data(self):
