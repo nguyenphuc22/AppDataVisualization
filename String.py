@@ -21,8 +21,17 @@ class StringManager:
             "menu_title": "Danh Mục",
             "menu_options": ["Trang chủ", "Sản phẩm", "Đánh giá"],
             "product_options": ["Trực quan hoá dữ liệu", "Giả thuyết"],
+            "product_hypothesis_title": ["Giả thuyết Phúc", "Giả thuyết Thành", "Giả thuyết Bình"],
+            "review_options": ["Trực quan hoá dữ liệu", "Giả thuyết"],
+            "review_hypothesis_title": ["Giả thuyết Nhi", "Giả thuyết Viên"],
             "menu_icons": ["house", ["box", "chart_with_upwards_trend", "lightbulb"], "star"],
-            "menu_icon": "cast"
+            "menu_icon": "cast",
+            "update_button": "Cập nhật",
+            "pick_file_button": "Chọn tệp",
+            "file_uploader_title": "Chọn tệp CSV hoặc Excel",
+            "File_uploaded" : "File đã được tải lên",
+            "Not_files_uploaded" : "Chưa có file nào được tải lên."
+
         }
 
     def get_string(self, key):

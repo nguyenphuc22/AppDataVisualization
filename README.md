@@ -3,6 +3,10 @@
 ## Cài đặt môi trường
 - streamlit run main.py
 
+## Ghi Chú
+- Đã cập nhật thêm phần giả thuyết cho từng người. Mọi người xem và bổ sung thêm vào nhé. Phần nào có từ "TODO + Tên ai thì người đó làm nhé" là phần cần bổ sung.
+- Phần ChatBot em sẽ nghiên cứu và cập nhật lên sau
+
 ## Kế hoạch
 Kế hoạch thực hiện ứng dụng "Data Visualization" cho dự án cuối kỳ môn học "Xử lý dữ liệu thông minh" của nhóm 5 người.
 
