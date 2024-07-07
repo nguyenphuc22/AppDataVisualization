@@ -30,8 +30,11 @@ class StringManager:
             "pick_file_button": "Chọn tệp",
             "file_uploader_title": "Chọn tệp CSV hoặc Excel",
             "File_uploaded" : "File đã được tải lên",
-            "Not_files_uploaded" : "Chưa có file nào được tải lên."
-
+            "Not_files_uploaded" : "Chưa có file nào được tải lên.",
+            "chatbot_title": "Trợ Lý",
+            "you" : "Bạn",
+            'bot' : 'Bot',
+            "send" : "Gửi"
         }
 
     def get_string(self, key):
