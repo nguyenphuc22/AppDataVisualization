@@ -1,4 +1,5 @@
 import streamlit as st
+from DataManager.ReviewManager import ReviewManager
 from String import StringManager
 from DataManager.ReviewManager import ReviewManager
 

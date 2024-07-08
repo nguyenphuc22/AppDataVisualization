@@ -7,7 +7,12 @@ from datetime import datetime
 
 class ReviewManager(AbstractDataManager):
     _instance = None
-
+    
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(ReviewManager, cls).__new__(cls, *args, **kwargs)
+        return cls._instance
+    
     def __init__(self):
         super().__init__()
         self.vietnamese_stopwords = self.load_stopwords('./Data/vietnamese-stopwords.txt')
@@ -53,11 +58,6 @@ class ReviewManager(AbstractDataManager):
             'Gree': ['gree'],
             'Murah': ['murah']
         }
-
-    def __new__(cls, *args, **kwargs):
-        if not cls._instance:
-            cls._instance = super(ReviewManager, cls).__new__(cls, *args, **kwargs)
-        return cls._instance
 
     def load_stopwords(self, file_path):
         with open(file_path, 'r', encoding='utf-8') as f:
@@ -159,6 +159,6 @@ class ReviewManager(AbstractDataManager):
         # Drop columns
         data.drop(columns=['cleanedContent', 'cleanedItem'], inplace=True)
         return data
-
+    
     def get_data(self):
         return self.data
