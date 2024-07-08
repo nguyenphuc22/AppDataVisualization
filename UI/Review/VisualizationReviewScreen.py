@@ -8,5 +8,4 @@ def visualizationReviewScreen(strings: StringManager):
     st.write(strings.get_string("data_visualization_message"))
     reviewManager = ReviewManager.get_instance()
     data = reviewManager.get_data()
-    st.write("DCM hien len chua:")
     st.dataframe(data)
