@@ -15,7 +15,7 @@ class StringManager:
             "product_page_message": "Đây là trang sản phẩm của chúng tôi.",
             "review_page_message": "Đây là trang đánh giá của chúng tôi.",
             "data_visualization_title": "Trực quan hoá dữ liệu",
-            "data_visualization_message": "Đây là trang trực quan hoá dữ liệu.",
+            "data_visualization_message": "Đây là trang trực quan hoá dữ liệu sau khi đã tiền xử lý.",
             "hypothesis_title": "Giả thuyết",
             "hypothesis_message": "Đây là trang giả thuyết.",
             "menu_title": "Danh Mục",
