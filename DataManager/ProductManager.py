@@ -14,8 +14,8 @@ class ProductManager(AbstractDataManager):
         super().__init__()
 
     def preprocess_data(self, data):
-        data = data.groupby('itemId').first().reset_index()
-        df_good_products = data[~data['location'].str.contains('overseas', case=False)]
+        df_good_products = data.groupby('itemId').first().reset_index()
+        df_good_products = df_good_products[~df_good_products['location'].str.contains('overseas', case=False)]
 
         brand_replacements = {
             'xiao': 'Xiaomi',
@@ -72,6 +72,10 @@ class ProductManager(AbstractDataManager):
         '''Reformat the rating system to correct format'''
         df_good_products['ratingScore'] = df_good_products['ratingScore'].apply(lambda score: round(float(score), 3))
 
+        '''reset index'''
+        df_good_products.reset_index(drop=True, inplace=True)
+
+        # return data
         return df_good_products
 
     def get_data(self):
