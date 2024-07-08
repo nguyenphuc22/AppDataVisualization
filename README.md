@@ -1,6 +1,8 @@
 # AppDataVisualization
 
 ## Cài đặt môi trường
+- Python 3.10.14
+## Chạy sử dụng CLI
 - streamlit run main.py
 
 ## Ghi Chú
