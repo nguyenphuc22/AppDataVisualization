@@ -24,7 +24,7 @@ def chatbotView():
     with st.sidebar.form(key='my_form'):
 
         user_input = st.text_input(f"{strings.get_string('you')}:", key='user_input')
-        submit_button = st.form_submit_button(label=f'{strings.get_string('send')}')
+        submit_button = st.form_submit_button(label=f"{strings.get_string('send')}")
 
     if submit_button and user_input:
         appContext.prompt = user_input
