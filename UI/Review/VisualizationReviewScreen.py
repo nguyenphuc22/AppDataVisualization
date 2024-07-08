@@ -1,7 +1,6 @@
 import streamlit as st
 from DataManager.ReviewManager import ReviewManager
 from String import StringManager
-from DataManager.ReviewManager import ReviewManager
 
 def visualizationReviewScreen(strings: StringManager):
     st.title(strings.get_string("data_visualization_title"))
