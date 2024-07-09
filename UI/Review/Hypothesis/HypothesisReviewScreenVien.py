@@ -1,11 +1,11 @@
 import streamlit as st
 from String import StringManager
 from DataManager.ReviewManager import ReviewManager
+import pandas as pd
+from collections import Counter
+from wordcloud import WordCloud
 import seaborn as sns
 import matplotlib.pyplot as plt
-import pandas as pd
-from wordcloud import WordCloud
-from collections import Counter
 
 def hypothesisReviewScreenVien(strings: StringManager):
     st.title(strings.get_string("hypothesis_title"))
@@ -14,7 +14,7 @@ def hypothesisReviewScreenVien(strings: StringManager):
     # Lấy instance của ReviewManager
     review_manager = ReviewManager.get_instance()
 
-    # Load dữ liệu (có thể đặt trong một hàm initialization riêng)
+    # Load dữ liệu
     if not hasattr(st.session_state, 'data_loaded'):
         try:
             review_manager.load_data("Data/filtered_data_review.xlsx")
@@ -29,12 +29,14 @@ def hypothesisReviewScreenVien(strings: StringManager):
     if df_new is None or df_new.empty:
         st.warning("No data available. Please check if data was loaded correctly.")
         return
+    
     # Ghi tiêu đề
     st.markdown("## Phân tích dữ liệu dựa trên cảm xúc của người dùng tác động như thế nào đánh chỉ số đánh giá và các nhãn hàng lớn trên thế giới") 
+
     # Hiển thị tóm tắt dữ liệu
     st.write(review_manager.get_data_summary())
 
-    # Visualization 1: Overall Sentiments
+    # Visualization 1: Cảm xúc tổng thể
     st.subheader("Các cảm xúc tổng thể")
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.countplot(x="Sentiment", data=df_new, ax=ax, order=["Negative", "Neutral", "Positive"], palette="viridis")
@@ -48,7 +50,7 @@ def hypothesisReviewScreenVien(strings: StringManager):
                 xác nhận rằng cảm xúc tích cực thường dẫn đến đánh giá cao và ngược lại.
     """)
 
-    # Visualization 2: Overall Ratings
+    # Visualization 2: Đánh giá tổng thể
     st.subheader("Các đánh giá tổng thể")
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.countplot(x="rating", data=df_new, ax=ax, palette="viridis")
@@ -60,7 +62,7 @@ def hypothesisReviewScreenVien(strings: StringManager):
                 Tuy nhiên ta cần tìm hiểu thêm các lý do tại sao vẫn có 1 số ít đánh giá thấp.
     """)
 
-    # Visualization 3: Rating Frequency by Sentiment
+    # Visualization 3: Tần suất đánh giá theo cảm xúc
     st.subheader("Tần suất đánh giá (%) theo cảm xúc")
     fig, ax = plt.subplots(figsize=(12, 8))
     percentstandardize_barplot(x="rating", y="Percentage", hue="Sentiment", data=df_new, ax=ax)
@@ -75,7 +77,7 @@ def hypothesisReviewScreenVien(strings: StringManager):
                 nhắc tổng thể, tâm lý “mềm lòng,” sự trung thành với thương hiệu và mong muốn khuyến khích cải thiện.
     """)
 
-    # Word Clouds and Top Words
+    # Word Clouds và Top Words
     st.subheader("Phân tích từ ngữ")
     col1, col2 = st.columns(2)
 
@@ -108,8 +110,8 @@ def hypothesisReviewScreenVien(strings: StringManager):
     - Ngược lại, các từ tiêu cực như "kém", "cũ", "hư", "không tốt", "lỗi", "hỏng" phản ánh chất lượng sản phẩm kém, 
                và "lừa đảo", "thất vọng", "ko đúng", "giao sai" thể hiện sự thất vọng về độ tin cậy và trung thực. 
                """)
-    
-    # Sentiment Analysis by Brand
+
+    # Phân tích cảm xúc theo thương hiệu
     st.subheader("Tỷ lệ phần trăm theo cảm xúc cho từng thương hiệu")
     sentiment_percent = calculate_sentiment_percentage(df_new)
     fig, ax = plt.subplots(figsize=(14, 10))
@@ -130,7 +132,7 @@ def hypothesisReviewScreenVien(strings: StringManager):
     - 2 thương hiệu lớn Apple và Samsung vẫn đang giữ vị thế vững chắc nhưng đang phải đối mặt cao sự kỳ vọng của người dùng.
     """)
 
-# Các hàm hỗ trợ (giữ nguyên như cũ)
+# Các hàm hỗ trợ 
 def percentstandardize_barplot(x, y, hue, data, ax=None, order=None):
     sns.barplot(x=x, y=y, hue=hue, ax=ax, order=order,
                 data=(data[[x, hue]]

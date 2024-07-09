@@ -138,29 +138,26 @@ class ReviewManager(AbstractDataManager):
         return 'None'
 
     def preprocess_data(self, data):
-        # Convert boughtDate to datetime and extract year, month, day
+        # Định dạng lại ngày 
         data['boughtDate'] = pd.to_datetime(data['boughtDate'].astype(int), format='%Y%m%d')
-        data['year'] = data['boughtDate'].dt.year
-        data['month'] = data['boughtDate'].dt.month
-        data['day'] = data['boughtDate'].dt.day
 
-        # Remove duplicates for 5-star ratings
+        # Remove duplicates các đánh giá 5 sao (seeding)
         df_rating_5 = data[data['rating'] == 5]
         df_rating_5_unique = df_rating_5.drop_duplicates(subset=['reviewContent'])
         data = pd.concat([data[data['rating'] != 5], df_rating_5_unique])
         data.reset_index(drop=True, inplace=True)
 
-        # Apply preprocessing to reviewContent and itemTitle
+        # Áp dụng hàm preprocessing
         data['cleanedContent'] = data['reviewContent'].apply(self.preprocessing)
         data['cleanedItem'] = data['itemTitle'].apply(self.preprocessing)
 
-        # Classify sentiment
+        # Phân loại cảm xúc
         data['Sentiment'] = data['cleanedContent'].apply(self.classify_sentiment)
 
-        # Extract brand
+        # Trích xuất thương hiệu
         data['brandName'] = data['cleanedItem'].apply(self.extract_brand)
 
-        # Drop columns
+        # Drop các cột không cần thiết
         data.drop(columns=['cleanedItem'], inplace=True)
         return data
     
