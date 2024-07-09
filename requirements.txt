@@ -53,3 +53,5 @@ scikit-learn
 PyYAML
 underthesea-core
 underthesea
+seaborn
+wordcloud

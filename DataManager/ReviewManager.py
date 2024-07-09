@@ -4,6 +4,7 @@ import pandas as pd
 import re
 from underthesea import word_tokenize
 from datetime import datetime
+import logging
 
 class ReviewManager(AbstractDataManager):
     _instance = None
@@ -58,6 +59,9 @@ class ReviewManager(AbstractDataManager):
             'Gree': ['gree'],
             'Murah': ['murah']
         }
+        # Thiết lập logging
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger(__name__)
 
     def load_stopwords(self, file_path):
         with open(file_path, 'r', encoding='utf-8') as f:
@@ -157,8 +161,37 @@ class ReviewManager(AbstractDataManager):
         data['brandName'] = data['cleanedItem'].apply(self.extract_brand)
 
         # Drop columns
-        data.drop(columns=['cleanedContent', 'cleanedItem'], inplace=True)
+        data.drop(columns=['cleanedItem'], inplace=True)
         return data
     
+    def load_data(self, file_path):
+        """
+        Load dữ liệu từ file Excel và tiền xử lý.
+        """
+        try:
+            self.logger.info(f"Loading data from {file_path}")
+            self.data = self.read_data(file_path)
+            self.logger.info("Data loaded and preprocessed successfully")
+        except Exception as e:
+            self.logger.error(f"Error loading data: {str(e)}")
+            raise
+
     def get_data(self):
+        """
+        Trả về dữ liệu đã được xử lý.
+        """
+        if self.data is None:
+            self.logger.warning("Data has not been loaded. Call load_data() first.")
         return self.data
+
+    def get_data_summary(self):
+        """
+        Trả về tóm tắt về dữ liệu.
+        """
+        if self.data is None:
+            return "Data has not been loaded."
+        return f"Data shape: {self.data.shape}, Columns: {', '.join(self.data.columns)}"
+    
+    @classmethod
+    def get_instance(cls):
+        return super().get_instance()
