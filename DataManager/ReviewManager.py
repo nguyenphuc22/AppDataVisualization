@@ -139,7 +139,7 @@ class ReviewManager(AbstractDataManager):
 
     def preprocess_data(self, data):
         # Định dạng lại ngày 
-        data['boughtDate'] = pd.to_datetime(data['boughtDate'].astype(int), format='%Y%m%d')
+        data['boughtDate'] = pd.to_datetime(data['boughtDate'], format='%Y%m%d', errors='coerce')
 
         # Remove duplicates các đánh giá 5 sao (seeding)
         df_rating_5 = data[data['rating'] == 5]
