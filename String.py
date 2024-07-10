@@ -21,7 +21,7 @@ class StringManager:
             "menu_title": "Danh Mục",
             "menu_options": ["Trang chủ", "Sản phẩm", "Đánh giá"],
             "product_options": ["Trực quan hoá dữ liệu", "Giả thuyết"],
-            "product_hypothesis_title": ["Giả thuyết Thương hiệu - Vị trí - Giảm Giá - Điểm đánh giá có ảnh hưởng lớn đến số lượng bán", "Giả thuyết Thành", "Giả thuyết Bình"],
+            "product_hypothesis_title": ["Giả thuyết Phúc", "Giả thuyết Thành", "Giả thuyết Bình"],
             "review_options": ["Trực quan hoá dữ liệu", "Giả thuyết"],
             "review_hypothesis_title": ["Giả thuyết Nhi", "Giả thuyết Viên"],
             "menu_icons": ["house", ["box", "chart_with_upwards_trend", "lightbulb"], "star"],
