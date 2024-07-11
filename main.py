@@ -25,6 +25,7 @@ appContext = AppContext.get_instance()
 def main():
     uploadFilesView(strings)
 
+    # Handle menu and display content based on selection
     menu = st.sidebar.selectbox(
         strings.get_string("menu_title"),
         strings.get_string("menu_options"),
@@ -33,82 +34,90 @@ def main():
     print(f"Selected menu: {menu}")
 
     if menu == strings.get_string("home_title"):
-        appContext.titlePage = strings.get_string("home_title")
+        set_title_and_screen(strings.get_string("home_title"), homeScreen)
+    elif menu in [strings.get_string("product_title"), strings.get_string("review_title")]:
+        handle_menu(menu)
+
+    chatbotView()
+    execute_screen()
+
+    # Handle the display of the uploaded data only on the home page
+    if appContext.titlePage == strings.get_string("home_title"):
+        if 'uploaded_data' in st.session_state and st.session_state['uploaded_data'] is not None:
+            st.write(strings.get_string("uploaded_data"))
+            st.write(st.session_state['uploaded_data'])
+
+
+def handle_menu(menu):
+    menu_options = {
+        strings.get_string("product_title"): {
+            "options": strings.get_string("product_options"),
+            "hypothesis_titles": strings.get_string("product_hypothesis_title"),
+            "default_title": strings.get_string("product_title")
+        },
+        strings.get_string("review_title"): {
+            "options": strings.get_string("review_options"),
+            "hypothesis_titles": strings.get_string("review_hypothesis_title"),
+            "default_title": strings.get_string("review_title")
+        }
+    }
+
+    selected_option = st.sidebar.selectbox(
+        menu,
+        menu_options[menu]["options"]
+    )
+    print(f"Selected option menu: {selected_option}")
+
+    if selected_option == strings.get_string("data_visualization_title"):
+        appContext.titlePage = menu_options[menu]["default_title"]
         print(f"Set titlePage to: {appContext.titlePage}")
-        homeScreen(strings)
-        
-    elif menu == strings.get_string("product_title"):
-        product_menu = st.sidebar.selectbox(
-            strings.get_string("product_title"),
-            strings.get_string("product_options")
+    elif selected_option == strings.get_string("hypothesis_title"):
+        hypothesis_menu = st.sidebar.selectbox(
+            strings.get_string("hypothesis_title"),
+            menu_options[menu]["hypothesis_titles"]
         )
-        print(f"Selected product_menu: {product_menu}")
+        print(f"Selected hypothesis_menu: {hypothesis_menu}")
 
-        if product_menu == strings.get_string("data_visualization_title"):
-            appContext.titlePage = strings.get_string("product_title")
-            print(f"Set titlePage to: {appContext.titlePage}")
-        elif product_menu == strings.get_string("hypothesis_title"):
-            product_hypothesis_menu = st.sidebar.selectbox(
-                strings.get_string("hypothesis_title"),
-                strings.get_string("product_hypothesis_title")
-            )
-            print(f"Selected product_hypothesis_menu: {product_hypothesis_menu}")
-
-            if product_hypothesis_menu == strings.get_string("product_hypothesis_title")[0]:
-                appContext.titlePage = strings.get_string("product_hypothesis_title")[0]
-            elif product_hypothesis_menu == strings.get_string("product_hypothesis_title")[1]:
-                appContext.titlePage = strings.get_string("product_hypothesis_title")[1]
-            elif product_hypothesis_menu == strings.get_string("product_hypothesis_title")[2]:
-                appContext.titlePage = strings.get_string("product_hypothesis_title")[2]
+        if hypothesis_menu in menu_options[menu]["hypothesis_titles"]:
+            appContext.titlePage = hypothesis_menu
             print(f"Set titlePage to: {appContext.titlePage}")
 
-    elif menu == strings.get_string("review_title"):
-        review_menu = st.sidebar.selectbox(
-            strings.get_string("review_title"),
-            strings.get_string("review_options")
-        )
-        print(f"Selected review_menu: {review_menu}")
+def set_title_and_screen(title, screen_function):
+    appContext.titlePage = title
+    print(f"Set titlePage to: {appContext.titlePage}")
+    screen_function(strings)
 
-        if review_menu == strings.get_string("data_visualization_title"):
-            appContext.titlePage = strings.get_string("review_title")
-            print(f"Set titlePage to: {appContext.titlePage}")
-        elif review_menu == strings.get_string("hypothesis_title"):
-            review_hypothesis_menu = st.sidebar.selectbox(
-                strings.get_string("hypothesis_title"),
-                strings.get_string("review_hypothesis_title")
-            )
-            print(f"Selected review_hypothesis_menu: {review_hypothesis_menu}")
-
-            if review_hypothesis_menu == strings.get_string("review_hypothesis_title")[0]:
-                appContext.titlePage = strings.get_string("review_hypothesis_title")[0]
-            elif review_hypothesis_menu == strings.get_string("review_hypothesis_title")[1]:
-                appContext.titlePage = strings.get_string("review_hypothesis_title")[1]
-            print(f"Set titlePage to: {appContext.titlePage}")
-
-
+def execute_screen():
     print(f"Final titlePage: {appContext.titlePage}")
 
-    if appContext.titlePage == strings.get_string("product_title"):
-        print("Executing visualizationProductScreen")
-        visualizationProductScreen(strings)
-    elif appContext.titlePage == strings.get_string("product_hypothesis_title")[0]:
-        hypothesisProductScreenPhuc(strings)
-    elif appContext.titlePage == strings.get_string("product_hypothesis_title")[1]:
-        hypothesisProductScreenThanh(strings)
-    elif appContext.titlePage == strings.get_string("product_hypothesis_title")[2]:
-        hypothesisProductScreenBinh(strings)
-    elif appContext.titlePage == strings.get_string("review_title"):
-        print("Executing visualizationReviewScreen")
-        visualizationReviewScreen(strings)
-    elif appContext.titlePage == strings.get_string("review_hypothesis_title")[1]:
-        hypothesisReviewScreenVien(strings)
-    elif appContext.titlePage == strings.get_string("review_hypothesis_title")[0]:
-        hypothesisReviewScreenNhi(strings)
-    print("===========================================")
-    
-    chatbotView()
+    # Update data managers with uploaded data if available
+    if 'uploaded_data' in st.session_state and st.session_state['uploaded_data'] is not None:
+        if appContext.titlePage == strings.get_string("product_title"):
+            # Update productManager with uploaded data
+            productManager.update_data(st.session_state['uploaded_data'])
+        elif appContext.titlePage == strings.get_string("review_title"):
+            # Update reviewManager with uploaded data
+            reviewManager.update_data(st.session_state['uploaded_data'])
+
+    # Mapping screen functions
+    screen_mapping = {
+        strings.get_string("product_title"): visualizationProductScreen,
+        strings.get_string("product_hypothesis_title")[0]: hypothesisProductScreenPhuc,
+        strings.get_string("product_hypothesis_title")[1]: hypothesisProductScreenThanh,
+        strings.get_string("product_hypothesis_title")[2]: hypothesisProductScreenBinh,
+        strings.get_string("review_title"): visualizationReviewScreen,
+        strings.get_string("review_hypothesis_title")[0]: hypothesisReviewScreenNhi,
+        strings.get_string("review_hypothesis_title")[1]: hypothesisReviewScreenVien
+    }
+
+    screen_function = screen_mapping.get(appContext.titlePage)
+    if screen_function:
+        print(f"Executing {screen_function.__name__}")
+        screen_function(strings)
+
 
 if __name__ == "__main__":
     productManager.read_data("Data/filtered_data_product.xlsx")
     reviewManager.read_data("Data/filtered_data_review.xlsx")
     main()
+    print("===========================================")
