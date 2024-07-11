@@ -27,4 +27,5 @@ class AbstractDataManager(ABC):
     
 
     def update_data(self, new_data):
-        new_data.to_excel(self.file_path, index=False)
+        self.data = self.preprocess_data(new_data) # Replace old data with new data
+        print("Data updated successfully.")
