@@ -117,7 +117,7 @@ def execute_screen():
 
 
 if __name__ == "__main__":
-    productManager.read_data("Data/filtered_data_product.xlsx")
-    reviewManager.read_data("Data/filtered_data_review.xlsx")
+    # productManager.read_data("Data/filtered_data_product.xlsx")
+    # reviewManager.read_data("Data/filtered_data_review.xlsx")
     main()
     print("===========================================")
