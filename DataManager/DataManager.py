@@ -6,7 +6,7 @@ class AbstractDataManager(ABC):
 
     def __init__(self):
         self.file_path = None
-        self.data = None
+        self.data = pd.DataFrame()
 
     @classmethod
     def get_instance(cls):

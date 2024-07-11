@@ -11,8 +11,7 @@ class ProductManager(AbstractDataManager):
         return cls._instance
 
     def __init__(self):
-        super().__init__()
-        self.data = pd.DataFrame()  # Ensure there is an initial data frame
+        super().__init__()        
 
     def preprocess_data(self, data):
         try:
