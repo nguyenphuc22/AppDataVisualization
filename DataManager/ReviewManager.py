@@ -65,6 +65,14 @@ class ReviewManager(AbstractDataManager):
                             'sellerId', 'sellerName', 'itemId', 'itemTitle', 'skuInfo', 
                             'skuId', 'upVotes', 'downVotes', 'isGoodReview']
 
+        # Convert both lists to lowercase for a case-insensitive comparison
+        required_columns_lower = [col.lower() for col in required_columns]
+        data_columns_lower = [col.lower() for col in data.columns]
+
+        # Debugging: Print columns for verification
+        print("Required columns (lowercase):", required_columns_lower)
+        print("Data columns (lowercase):", data_columns_lower)
+
         if all(col in data.columns for col in required_columns):
             return {'valid': True, 'type': 'review'}
         else:

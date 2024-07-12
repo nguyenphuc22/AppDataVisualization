@@ -37,6 +37,8 @@ class StringManager:
             'bot' : 'Bot',
             "send" : "Gửi",
             "wrong_format": "Sai format file",
+            "update_success": "Cập nhật thành công",
+            "unsupported_file_type": "Loại file không được hỗ trợ",
         }
 
     def get_string(self, key):
