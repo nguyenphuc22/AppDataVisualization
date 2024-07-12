@@ -1,9 +1,7 @@
 from DataManager.DataManager import AbstractDataManager
-
 import pandas as pd
 import re
 from underthesea import word_tokenize
-from datetime import datetime
 
 class ReviewManager(AbstractDataManager):
     _instance = None
@@ -58,17 +56,6 @@ class ReviewManager(AbstractDataManager):
             'Gree': ['gree'],
             'Murah': ['murah']
         }
-
-    def check_format(self, data):
-        required_columns = ['reviewRateId', 'boughtDate', 'reviewContent', 'reviewTime', 'rating', 
-                            'likeCount', 'likeText', 'helpful', 'isPurchased', 'isGuest', 
-                            'sellerId', 'sellerName', 'itemId', 'itemTitle', 'skuInfo', 
-                            'skuId', 'upVotes', 'downVotes', 'isGoodReview']
-
-        if all(col in data.columns for col in required_columns):
-            return {'valid': True, 'type': 'review'}
-        else:
-            return {'valid': False}
 
     def load_stopwords(self, file_path):
         with open(file_path, 'r', encoding='utf-8') as f:

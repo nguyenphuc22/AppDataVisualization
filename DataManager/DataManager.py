@@ -24,8 +24,22 @@ class AbstractDataManager(ABC):
     def preprocess_data(self, data):
         # This method should return a pandas DataFrame
         pass
-    
 
     def update_data(self, new_data):
         self.data = self.preprocess_data(new_data) # Replace old data with new data
-        print("Data updated successfully.")
+
+def check_format(data):
+    required_product_columns = ['itemId', 'name', 'priceShow', 'discount', 'ratingScore', 'review', 
+                'location', 'sellerName', 'sellerId', 'brandName', 'brandId', 
+                'price', 'category', 'originalPrice', 'itemSoldCntShow', 'options']
+    required_review_columns = ['reviewRateId', 'boughtDate', 'reviewContent', 'reviewTime', 'rating', 
+                        'likeCount', 'likeText', 'helpful', 'isPurchased', 'isGuest', 
+                        'sellerId', 'sellerName', 'itemId', 'itemTitle', 'skuInfo', 
+                        'skuId', 'upVotes', 'downVotes', 'isGoodReview']
+
+    if all(col in data.columns for col in required_product_columns):
+        return {'valid': True, 'type': 'product'}
+    elif all(col in data.columns for col in required_review_columns):
+        return {'valid': True, 'type': 'review'}
+    else:
+        return {'valid': False}

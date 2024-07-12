@@ -1,61 +1,69 @@
 import streamlit as st
 import pandas as pd
 from String import StringManager
-from DataManager.ProductManager import ProductManager  # Import ProductManager
-from DataManager.ReviewManager import ReviewManager  # Import ReviewManager
+from DataManager.ProductManager import ProductManager
+from DataManager.ReviewManager import ReviewManager
+from DataManager.DataManager import check_format
 
 def uploadFilesView(strings: StringManager):
-    # Initialize session state for file uploader key
-    if 'file_uploader_key' not in st.session_state:
-        st.session_state['file_uploader_key'] = 'file_uploader_0'
+    # Initialize session state for upload results
+    if 'upload_result' not in st.session_state:
+        st.session_state['upload_result'] = {'valid': None, 'type': None, 'message': None}
 
-    # Display the file uploader widget with dynamic key
+    # Display the file uploader widget
     uploaded_file = st.sidebar.file_uploader(
         strings.get_string("file_uploader_title"),
-        type=['csv', 'xlsx'],
-        key=st.session_state['file_uploader_key']
+        type=['csv', 'xlsx']
     )
 
     # Handle the uploaded file
     if uploaded_file is not None:
-        # Process the file here...
-        if st.sidebar.button(strings.get_string("update_button")):
-            # Change the file uploader key
-            st.session_state['file_uploader_key'] = f"file_uploader_{hash(str(st.session_state['file_uploader_key']))}"
-            # TODO: Cập nhật file mới vào data nhé Bình
-            # Change the file uploader key to force re-render
-            st.session_state['file_uploader_key'] = f"file_uploader_{hash(str(st.session_state['file_uploader_key']))}"
+        # Process the uploaded file based on its type
+        if uploaded_file.type == 'text/csv':
+            new_data = pd.read_csv(uploaded_file)
+        elif uploaded_file.type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+            new_data = pd.read_excel(uploaded_file)
+        else:
+            st.error(strings.get_string("unsupported_file_type"))
+            return
 
-            # Process the uploaded file based on its type
-            if uploaded_file.type == 'text/csv':
-                new_data = pd.read_csv(uploaded_file)
-            elif uploaded_file.type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-                new_data = pd.read_excel(uploaded_file)
+        # Update the ProductManager or ReviewManager with the new data
+        try:
+            result = check_format(new_data)
+
+            if result['valid']:
+                st.session_state['file_type'] = result['type']
+                st.session_state['upload_result'] = {
+                    'valid': True,
+                    'type': result['type'],
+                    'message': f"File {result['type']} được upload thành công."
+                }
+
+                # Update the correct manager based on file type
+                if result['type'] == 'product':
+                    ProductManager.get_instance().update_data(new_data)
+                elif result['type'] == 'review':
+                    ReviewManager.get_instance().update_data(new_data)
             else:
-                st.error(strings.get_string("unsupported_file_type"))
-                return
-            
-            # Update the ProductManager or ReviewManager with the new data
-            try:
-                result = None
-                if 'reviewContent' in new_data.columns:
-                    review_manager = ReviewManager.get_instance()
-                    result = review_manager.check_format(new_data)
-                else:
-                    product_manager = ProductManager.get_instance()
-                    result = product_manager.check_format(new_data)
+                st.session_state['upload_result'] = {
+                    'valid': False,
+                    'type': None,
+                    'message': strings.get_string("wrong_format")
+                }
 
-                if result['valid']:
-                    st.session_state['file_type'] = result['type']
-                    if result['type'] == 'review':
-                        review_manager.update_data(new_data)
-                    elif result['type'] == 'product':
-                        product_manager.update_data(new_data)
-                else:
-                    st.error(strings.get_string("wrong_format"))
+        except ValueError as e:
+            st.session_state['upload_result'] = {
+                'valid': False,
+                'type': None,
+                'message': f"Error: {e}"
+            }
 
-            except ValueError as e:
-                st.error(f"Error: {e}")
+        # Display the results based on session state
+        if st.session_state['upload_result']['message']:
+            if st.session_state['upload_result']['valid']:
+                st.success(st.session_state['upload_result']['message'])  # Success notification
+            else:
+                st.error(st.session_state['upload_result']['message'])  # Error notification
 
-            # Display the uploaded data
-            # st.rerun()
+        # Reset upload_result after display
+        st.session_state['upload_result'] = {'valid': None, 'type': None, 'message': None}
