@@ -35,7 +35,8 @@ class StringManager:
             "chatbot_title": "Trợ Lý",
             "you" : "Bạn",
             'bot' : 'Bot',
-            "send" : "Gửi"
+            "send" : "Gửi",
+            "wrong_format": "Sai format file",
         }
 
     def get_string(self, key):
