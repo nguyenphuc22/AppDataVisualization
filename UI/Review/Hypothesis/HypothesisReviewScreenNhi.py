@@ -1,11 +1,13 @@
 import streamlit as st
-from String import StringManager
-from DataManager.ReviewManager import ReviewManager
 import pandas as pd
 from collections import Counter, defaultdict
 from wordcloud import WordCloud
 import seaborn as sns
 import matplotlib.pyplot as plt
+
+from AppContext import AppContext
+from String import StringManager
+from DataManager.ReviewManager import ReviewManager
 
 def hypothesisReviewScreenNhi(strings: StringManager):
     st.title(strings.get_string("hypothesis_title"))
@@ -13,23 +15,11 @@ def hypothesisReviewScreenNhi(strings: StringManager):
 
     # Lấy instance của ReviewManager
     review_manager = ReviewManager.get_instance()
-
-    # Load dữ liệu
-    if not hasattr(st.session_state, 'data_loaded'):
-        try:
-            review_manager.load_data("Data/filtered_data_review.xlsx")
-            st.session_state.data_loaded = True
-        except Exception as e:
-            st.error(f"Error loading data: {str(e)}")
-            return
         
     # Lấy dữ liệu
     df_new = review_manager.get_data()
-
-    if df_new is None or df_new.empty:
-        st.warning("No data available. Please check if data was loaded correctly.")
-        return
     
+    # Ghi tiêu đề
     st.markdown("## Trích xuất & phân tích những đặc điểm của sản phẩm thường được nhắc đến trong review")
 
     product_features = {
@@ -65,9 +55,8 @@ def hypothesisReviewScreenNhi(strings: StringManager):
         count = row['Count']
         word_counts[word] += count
 
-    wordcloud_all = WordCloud(width=800, height=600, background_color='white', colormap='plasma').generate_from_frequencies(word_counts)
-
     # Visualization 1: Word Clouds cho từng đặc điểm và tổng hợp
+    wordcloud_all = WordCloud(width=800, height=600, background_color='white', colormap='plasma').generate_from_frequencies(word_counts)
     fig, axs = plt.subplots(2, 4, figsize=(20, 10))
     fig.suptitle('Word Clouds cho từng đặc điểm và tổng hợp')
 
@@ -82,13 +71,12 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     axs[1, 3].axis('off')
 
     st.pyplot(fig)
-
-    feature_totals = filtered_words_df.groupby('Feature')['Count'].sum().reset_index()
     st.markdown("""
         **Nhận xét:**
         """)
-
+    
     # Visualization 2: Biểu đồ cột tổng Count cho mỗi Feature
+    feature_totals = filtered_words_df.groupby('Feature')['Count'].sum().reset_index()
     fig, ax = plt.subplots(figsize=(10, 6))
     bars = ax.bar(feature_totals['Feature'], feature_totals['Count'], color='skyblue')
 
@@ -104,7 +92,11 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     plt.xticks(rotation=30)
     plt.tight_layout()
     st.pyplot(fig)
-
+    st.markdown("""
+        **Nhận xét:**
+        """)
+    
+    # Visualization 3: Biểu đồ cột Keywords Count by Brand and Feature
     for feature, keywords in product_features.items():
         df_new[feature + '_count'] = df_new['cleanedContent'].apply(lambda x: count_keywords(keywords, x))
 
@@ -117,22 +109,19 @@ def hypothesisReviewScreenNhi(strings: StringManager):
         plot_data = pd.concat([plot_data, temp_df])
 
     plot_data.reset_index(drop=True, inplace=True)
-    st.markdown("""
-        **Nhận xét:**
-        """)
-
-
-    # Visualization 3: Biểu đồ cột Keywords Count by Brand and Feature
     fig, ax = plt.subplots(figsize=(24, 12))
     sns.barplot(x='brandName', y='Keywords Count', hue='Feature', data=plot_data, alpha=0.8, ax=ax)
-
     plt.title('Keywords Count by Brand and Feature')
     plt.xlabel('Brand Name')
     plt.ylabel('Keywords Count')
     plt.ylim(0, 2000)
     plt.grid(axis='y')
     st.pyplot(fig)
-
+    st.markdown("""
+        **Nhận xét:**
+        """)
+    
+    # Visualization 4: Biểu đồ tròn tỷ lệ đặc tính cho các brand hàng đầu
     top_brands = df_new['brandName'].value_counts().nlargest(6).index.tolist()
     df_top = df_new[df_new['brandName'].isin(top_brands)]
 
@@ -143,12 +132,7 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     df_feature_counts['tổng giá trị'] = df_feature_counts.sum(axis=1)
     df_feature_counts = df_feature_counts.sort_values(by='tổng giá trị', ascending=False)
     df_feature_counts = df_feature_counts.drop(columns=['tổng giá trị'])
-    st.markdown("""
-        **Nhận xét:**
-        """)
-
-
-    # Visualization 4: Biểu đồ tròn tỷ lệ đặc tính cho các brand hàng đầu
+   
     fig, axs = plt.subplots(2, 3, figsize=(20, 12))
     fig.suptitle('Biểu đồ tỷ lệ đặc tính cho các brand hàng đầu')
     colors = plt.cm.Set2.colors
@@ -161,10 +145,15 @@ def hypothesisReviewScreenNhi(strings: StringManager):
 
     plt.tight_layout()
     st.pyplot(fig)
+    st.markdown("""
+        **Nhận xét:**
+        """)
 
+    # Visualization 5: Biểu đồ cột tỷ lệ nhắc đến các đặc tính trong mỗi bình luận của các brand name
     df_binary = df_top[['brandName', 'chất lượng_count', 'giá cả_count', 'thiết kế_count', 'hiệu năng_count', 'đặc điểm kỹ thuật_count', 'dịch vụ_count', 'tình trạng sản phẩm_count']]
     df_binary.columns = ['brandName', 'chất lượng', 'giá cả', 'thiết kế', 'hiệu năng', 'đặc điểm kỹ thuật', 'dịch vụ', 'tình trạng sản phẩm']
     feature_columns = df_binary.columns[1:]
+    
     for col in feature_columns:
         df_binary[col] = df_binary[col].apply(lambda x: 1 if x > 0 else 0)
 
@@ -172,13 +161,7 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     brand_comment_counts = df_binary.groupby('brandName').size()
     brand_feature_ratios = brand_feature_counts.div(brand_comment_counts, axis=0)
 
-    plot_data = brand_feature_ratios.reset_index().melt(id_vars='brandName', var_name='Feature', value_name='Ratio')
-    st.markdown("""
-        **Nhận xét:**
-        """)
-
-
-    # Visualization 5: Biểu đồ cột tỷ lệ nhắc đến các đặc tính trong mỗi bình luận của các brand name
+    plot_data = brand_feature_ratios.reset_index().melt(id_vars='brandName', var_name='Feature', value_name='Ratio')  
     fig, ax = plt.subplots(figsize=(14, 8))
     sns.barplot(x='brandName', y='Ratio', hue='Feature', data=plot_data, alpha=0.8)
     plt.title('Tỷ lệ nhắc đến các đặc tính trong mỗi bình luận của các brand name')
@@ -186,13 +169,22 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     plt.ylabel('Tỷ lệ nhắc đến')
     plt.legend(title='Đặc tính')
     plt.grid(axis='y')
-
     st.pyplot(fig)
 
     st.markdown("""
         **Nhận xét:**
         """)
     
+    appContext = AppContext.get_instance()
+    appContext.titlePage = strings.get_string("review_hypothesis_title")[0]
+    appContext.content = "Đây là trích xuất & phân tích những đặc điểm của sản phẩm thường được nhắc đến trong review"
+    appContext.hyphothesisTitle = "Từ đây ta đưa ra dược các nhận xét như sau"
+
+    # hpsContent sẽ là kết quả của phân tích
+    # hpsContent = (f"Kết quả mô hình OLS: \n {model.summary().as_text()} \n "
+    #               f"\n Kết luận: \n{conclusions}")
+    # appContext.hyphothesisContent = hpsContent
+
 # Các hàm hỗ trợ
 def count_words(content_column):
     word_counts = Counter()
@@ -213,3 +205,4 @@ def filter_words_by_features(word_counts_df, features_dict):
 def count_keywords(keywords, text):
     count = sum(1 for word in text if word in keywords)
     return count
+

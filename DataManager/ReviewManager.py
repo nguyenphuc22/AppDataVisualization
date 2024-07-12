@@ -63,14 +63,17 @@ class ReviewManager(AbstractDataManager):
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
+    # Load dữ liệu stopwords
     def load_stopwords(self, file_path):
         with open(file_path, 'r', encoding='utf-8') as f:
             return set(f.read().splitlines())
 
+    # Load dữ liệu compound words
     def load_compound_words(self, file_path):
         with open(file_path, 'r', encoding='utf-8') as file:
             return set(line.strip() for line in file)
 
+    # Lọc các biểu cảm trong văn bản
     def remove_emojis(self, text):
         emoji_pattern = re.compile("["
                                    u"\U0001F600-\U0001F64F"  # emoticons
@@ -82,13 +85,20 @@ class ReviewManager(AbstractDataManager):
                                    "]+", flags=re.UNICODE)
         return emoji_pattern.sub(r'', text)
 
+    # Loại bỏ dấu câu
     def remove_punctuation(self, text):
         return re.sub(r'[^\w\s]', '', text)
 
+    # Thay thế icon sao bằng từ "sao"
     def replace_star_icons(self, text):
         star_pattern = re.compile(r'[*★☆⭐🌟✨]')
         return star_pattern.sub(' sao', text)
+    
+    # Thay thế dấu chấm nhiều lần bằng một dấu cách
+    def replace_dots(self, text):
+        return re.sub(r'\.{2,}', ' ', text)    
 
+    # Kết hợp các từ ghép
     def combine_compound_words(self, words):
         combined_words = []
         i = 0
@@ -103,9 +113,7 @@ class ReviewManager(AbstractDataManager):
             i += 1
         return combined_words
 
-    def replace_dots(self, text):
-        return re.sub(r'\.{2,}', ' ', text)
-
+    # Tiền xử lý dữ liệu
     def preprocessing(self, text):
         text = str(text).lower()
         text = self.replace_dots(text)
@@ -118,6 +126,7 @@ class ReviewManager(AbstractDataManager):
         words = [w.replace('_', ' ') for w in words]
         return words
 
+    # Phân loại cảm xúc
     def classify_sentiment(self, keywords):
         positive_count = sum(1 for word in keywords if word in self.positive_words)
         negative_count = sum(1 for word in keywords if word in self.negative_words)
@@ -130,6 +139,7 @@ class ReviewManager(AbstractDataManager):
         else:
             return 'Neutral'
 
+    # Trích xuất thương hiệu
     def extract_brand(self, cleaned_item):
         for brand, keywords in self.brand_map.items():
             for keyword in keywords:
@@ -137,6 +147,7 @@ class ReviewManager(AbstractDataManager):
                     return brand
         return 'None'
 
+    # Load dữ liệu
     def preprocess_data(self, data):
         # Định dạng lại ngày 
         data['boughtDate'] = pd.to_datetime(data['boughtDate'], format='%Y%m%d', errors='coerce')
@@ -160,18 +171,6 @@ class ReviewManager(AbstractDataManager):
         # Drop các cột không cần thiết
         data.drop(columns=['cleanedItem'], inplace=True)
         return data
-    
-    def load_data(self, file_path):
-        """
-        Load dữ liệu từ file Excel và tiền xử lý.
-        """
-        try:
-            self.logger.info(f"Loading data from {file_path}")
-            self.data = self.read_data(file_path)
-            self.logger.info("Data loaded and preprocessed successfully")
-        except Exception as e:
-            self.logger.error(f"Error loading data: {str(e)}")
-            raise
 
     def get_data(self):
         """
@@ -189,6 +188,3 @@ class ReviewManager(AbstractDataManager):
             return "Data has not been loaded."
         return f"Data shape: {self.data.shape}, Columns: {', '.join(self.data.columns)}"
     
-    @classmethod
-    def get_instance(cls):
-        return super().get_instance()

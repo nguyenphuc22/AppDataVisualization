@@ -1,11 +1,13 @@
 import streamlit as st
-from String import StringManager
-from DataManager.ReviewManager import ReviewManager
 import pandas as pd
 from collections import Counter
 from wordcloud import WordCloud
 import seaborn as sns
 import matplotlib.pyplot as plt
+
+from AppContext import AppContext
+from String import StringManager
+from DataManager.ReviewManager import ReviewManager
 
 def hypothesisReviewScreenVien(strings: StringManager):
     st.title(strings.get_string("hypothesis_title"))
@@ -14,27 +16,14 @@ def hypothesisReviewScreenVien(strings: StringManager):
     # Lấy instance của ReviewManager
     review_manager = ReviewManager.get_instance()
 
-    # Load dữ liệu
-    if not hasattr(st.session_state, 'data_loaded'):
-        try:
-            review_manager.load_data("Data/filtered_data_review.xlsx")
-            st.session_state.data_loaded = True
-        except Exception as e:
-            st.error(f"Error loading data: {str(e)}")
-            return
-
     # Lấy dữ liệu
     df_new = review_manager.get_data()
 
-    if df_new is None or df_new.empty:
-        st.warning("No data available. Please check if data was loaded correctly.")
-        return
-    
     # Ghi tiêu đề
     st.markdown("## Phân tích dữ liệu dựa trên cảm xúc của người dùng tác động như thế nào đánh chỉ số đánh giá và các nhãn hàng lớn trên thế giới") 
 
     # Hiển thị tóm tắt dữ liệu
-    st.write(review_manager.get_data_summary())
+    # st.write(review_manager.get_data_summary())
 
     # Visualization 1: Cảm xúc tổng thể
     st.subheader("Các cảm xúc tổng thể")
@@ -77,7 +66,7 @@ def hypothesisReviewScreenVien(strings: StringManager):
                 nhắc tổng thể, tâm lý “mềm lòng,” sự trung thành với thương hiệu và mong muốn khuyến khích cải thiện.
     """)
 
-    # Word Clouds và Top Words
+    # Visualizatin 4: Word Clouds và Top Words
     st.subheader("Phân tích từ ngữ")
     col1, col2 = st.columns(2)
 
@@ -111,7 +100,7 @@ def hypothesisReviewScreenVien(strings: StringManager):
                và "lừa đảo", "thất vọng", "ko đúng", "giao sai" thể hiện sự thất vọng về độ tin cậy và trung thực. 
                """)
 
-    # Phân tích cảm xúc theo thương hiệu
+    # Visulisation 5: Phân tích cảm xúc theo thương hiệu
     st.subheader("Tỷ lệ phần trăm theo cảm xúc cho từng thương hiệu")
     sentiment_percent = calculate_sentiment_percentage(df_new)
     fig, ax = plt.subplots(figsize=(14, 10))
@@ -131,6 +120,40 @@ def hypothesisReviewScreenVien(strings: StringManager):
     - Các hãng của Trung Quốc như Realme, Oppo, Vivo đang tạo ấn tượng tốt với khách hàng.
     - 2 thương hiệu lớn Apple và Samsung vẫn đang giữ vị thế vững chắc nhưng đang phải đối mặt cao sự kỳ vọng của người dùng.
     """)
+
+    # Cập nhật AppContext
+    appContext = AppContext.get_instance()
+    appContext.titlePage = strings.get_string("review_hypothesis_title")[1]
+    appContext.content = "Đây là phần phân tích cảm xúc của người dùng có tác động như thế nào đến đánh giá và các nhãn hàng lớn trên thế giới."
+    appContext.hyphothesisTitle = "Từ đây ta đưa ra dược các nhận xét như sau"
+
+    # hpsContent sẽ là kết quả của phân tích
+    hpsContent = (f"""
+    1. Hình ảnh trực quan 1: Cảm xúc tổng thể
+    Nhận xét: Cảm xúc tiêu cực chiếm khoảng 500 lượt trong dữ liệu, tương ứng với các cảm xúc trung lập và tiêu cực lần lượt là vào khoảng 1500 lượt và 3000 lượt. Điều này cho ta thấy rằng các đánh giá tiêu cực chủ yếu đi kèm với cảm xúc tiêu cực, trong khi đánh giá cao (4-5 sao) chủ yếu đi kèm với cảm xúc tích cực. Điều này xác nhận rằng cảm xúc tích cực thường dẫn đến đánh giá cao và ngược lại.
+
+    2. Hình ảnh trực quan 2: Đánh giá tổng thể
+    Nhận xét: Đa số khách hàng đánh giá rất cao sản phẩm và dịch vụ, cho thấy được sự hài lòng cao. Tuy nhiên ta cần tìm hiểu thêm các lý do tại sao vẫn có 1 số ít đánh giá thấp.
+
+    3. Hình ảnh trực quan 3: Tần suất đánh giá theo cảm xúc
+    Nhận xét: 
+    - Biểu đồ tần suất đánh giá % theo cảm xúc cho thấy rằng đánh giá 1-2 sao chủ yếu là tiêu cực, 3-4 sao là trung lập và 5 sao có cả tiêu cực lẫn tích cực. Một số lý do có thể giải thích cảm xúc tích cực trong đánh giá 1 sao bao gồm đánh giá dựa trên một khía cạnh cụ thể, sự thất vọng và việc gửi thông điệp mạnh mẽ.
+    - Ngược lại, phản hồi tiêu cực trong đánh giá 5 sao có thể do tiêu chuẩn đánh giá khác nhau, cân nhắc tổng thể, tâm lý “mềm lòng,” sự trung thành với thương hiệu và mong muốn khuyến khích cải thiện.
+
+    4. Hình ảnh trực quan 4: Word Clouds và Top Words
+    Nhận xét:     
+    - Các từ "Chất lượng" và "Uy tín" trong cảm xúc tích cực cho thấy sản phẩm/dịch vụ đáp ứng tốt tiêu chuẩn và xây dựng niềm tin với khách hàng. "Nhanh", "nhanh chóng", "mới" nhấn mạnh sự nhanh nhẹn và mới mẻ, trong khi "Hài lòng", "Tuyệt vời", "Cảm ơn", "Nhiệt tình" thể hiện sự hài lòng cao của khách hàng. Các từ như "Rẻ" và "Hợp lý" cho thấy khách hàng quan tâm đến giá trị kinh tế.
+    - Ngược lại, các từ tiêu cực như "kém", "cũ", "hư", "không tốt", "lỗi", "hỏng" phản ánh chất lượng sản phẩm kém, và "lừa đảo", "thất vọng", "ko đúng", "giao sai" thể hiện sự thất vọng về độ tin cậy và trung thực.
+
+    5. Hình ảnh trực quan 5: Phân tích cảm xúc theo thương hiệu
+    Nhận xét:     
+    - Tỷ lệ đánh giá tích cực vượt trội hoàn toàn so với tiêu cực.
+    - Realme dẫn đầu ở mức tầm 95% cảm xúc tích cực. Theo sau là các hãng LG, Sony, Vsmart là trên 90%. Tiếp theo là Apple, Samsung và các hãng khác nằm trong khoảng 80-90%.
+    - Huawei và Xiaomi có điểm đánh giá tiêu cực cao nhất. Hãng đang đối với mặt với một vài thách thức về hình ảnh và sự hài lòng của khách hàng.
+    - Các hãng của Trung Quốc như Realme, Oppo, Vivo đang tạo ấn tượng tốt với khách hàng.
+    - 2 thương hiệu lớn Apple và Samsung vẫn đang giữ vị thế vững chắc nhưng đang phải đối mặt cao sự kỳ vọng của người dùng.
+    """)
+    appContext.hyphothesisContent = hpsContent
 
 # Các hàm hỗ trợ 
 def percentstandardize_barplot(x, y, hue, data, ax=None, order=None):
