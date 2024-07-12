@@ -11,8 +11,17 @@ class ProductManager(AbstractDataManager):
         return cls._instance
 
     def __init__(self):
-        super().__init__()
-        self.data = pd.DataFrame()  # Ensure there is an initial data frame
+        super().__init__()        
+
+    def check_format(self, data):
+        required_columns = ['itemId', 'name', 'priceShow', 'discount', 'ratingScore', 'review', 
+                            'location', 'sellerName', 'sellerId', 'brandName', 'brandId', 
+                            'price', 'category', 'originalPrice', 'itemSoldCntShow', 'options']
+
+        if all(col in data.columns for col in required_columns):
+            return {'valid': True, 'type': 'product'}
+        else:
+            return {'valid': False}
 
     def preprocess_data(self, data):
         try:

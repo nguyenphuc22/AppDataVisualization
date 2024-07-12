@@ -36,15 +36,26 @@ def uploadFilesView(strings: StringManager):
                 return
             
             # Update the ProductManager or ReviewManager with the new data
-            if 'reviewContent' in new_data.columns:
-                st.session_state['file_type'] = 'review'
-                review_manager = ReviewManager.get_instance()
-                review_manager.update_data(new_data)
-            else:
-                st.session_state['file_type'] = 'product'
-                product_manager = ProductManager.get_instance()
-                product_manager.update_data(new_data)
+            try:
+                result = None
+                if 'reviewContent' in new_data.columns:
+                    review_manager = ReviewManager.get_instance()
+                    result = review_manager.check_format(new_data)
+                else:
+                    product_manager = ProductManager.get_instance()
+                    result = product_manager.check_format(new_data)
+
+                if result['valid']:
+                    st.session_state['file_type'] = result['type']
+                    if result['type'] == 'review':
+                        review_manager.update_data(new_data)
+                    elif result['type'] == 'product':
+                        product_manager.update_data(new_data)
+                else:
+                    st.error(result['message'])
+
+            except ValueError as e:
+                st.error(f"Error: {e}")
 
             # Display the uploaded data
-            st.rerun()
-
+            # st.rerun()
