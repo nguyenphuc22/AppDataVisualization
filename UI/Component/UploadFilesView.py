@@ -52,12 +52,10 @@ def uploadFilesView(strings: StringManager):
                     elif result['type'] == 'product':
                         product_manager.update_data(new_data)
                 else:
-                    st.error(result['message'])
-                    print("1")
+                    st.error(strings.get_string("wrong_format"))
 
             except ValueError as e:
                 st.error(f"Error: {e}")
 
             # Display the uploaded data
             # st.rerun()
-
