@@ -75,4 +75,6 @@ underthesea-core
 underthesea
 seaborn
 wordcloud
+matplotlib
+statsmodels
 
