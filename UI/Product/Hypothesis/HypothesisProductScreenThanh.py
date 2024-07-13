@@ -6,6 +6,8 @@ import seaborn as sns
 from sklearn.preprocessing import LabelEncoder
 from statsmodels.formula.api import ols
 from DataManager.ProductManager import ProductManager
+from AppContext import AppContext
+from ChatBot import OpenAIChatbot
 
 def hypothesisProductScreenThanh(strings: StringManager):
     print("Hypothesis Product Screen Thanh Entry")
@@ -47,20 +49,17 @@ def hypothesisProductScreenThanh(strings: StringManager):
 
     # Kết luận và đề xuất dựa trên kết quả mô hình
     st.header("Kết luận & Khuyến nghị")
+    openAi = OpenAIChatbot()
 
-    pvalue = model.pvalues['price_encoded']
-    coefficient = model.params['price_encoded']
+     # Update AppContext
+    appContext = AppContext.get_instance()
+    appContext.titlePage = strings.get_string("product_hypothesis_title")[1]
+    appContext.content = "Đây là giả thuyết ols xem các biến giá bán có ảnh hưởng đến số lượng bán hay không."
+    appContext.hyphothesisTitle = "Giả thuyết sử dụng OLS trên tập dữ liệu số lượng bản Lazada"
+    hpsContent = (f"Kết quả mô hình OLS: \n {model.summary().as_text()} \n")
 
-    #Phần này nhờ đồng chị Thị Mai Nhi 
-    if pvalue < 0.05:
-        conclusion = f"(p-value = {pvalue:.4f}) nghĩa là mô hình dự đoán có giá trị thống kê và đáng tin cậy"
-        if coefficient > 0:
-            recommendation = "Khi giá tăng, số lượng bán có xu hướng tăng. Điều này có thể do các sản phẩm đắt tiền hơn thường có chất lượng cao hơn hoặc được ưa chuộng hơn."
-        else:
-            recommendation = "Khi giá tăng, số lượng bán có xu hướng giảm. Điều này phù hợp với quy luật cung cầu cơ bản."
-    else:
-        conclusion = f"Giá (price_encoded) không có ảnh hưởng đáng kể đến số lượng bán (p-value = {pvalue:.4f})"
-        recommendation = "Cần xem xét các yếu tố khác có thể ảnh hưởng đến số lượng bán, như chất lượng sản phẩm, marketing, hoặc các yếu tố thị trường khác."
+    appContext.hyphothesisContent = hpsContent
+    appContext.prompt = "Dựa vào kết quả OLS bên trên, hãy nhận xét và đưa ra kết luận cho tôi, ở định dạng markdown"
+    response = openAi.generate_response(appContext)
 
-    st.markdown(f"**Kết luận:** {conclusion}")
-    st.markdown(f"**Khuyến nghị:** {recommendation}")
+    st.markdown(response)
