@@ -14,8 +14,8 @@ class AbstractDataManager(ABC):
             cls._instances[cls] = cls()
         return cls._instances[cls]
 
-    def read_data(self, file_path):
-        if self.data is None:
+    def read_data(self, file_path, isNewFile = False):
+        if self.data is None or isNewFile is True:
             self.file_path = file_path
             data = pd.read_excel(file_path)
             self.data = self.preprocess_data(data)
@@ -30,4 +30,5 @@ class AbstractDataManager(ABC):
 
     def update_data(self, new_data):
         new_data.to_excel(self.file_path, index=False)
+        self.read_data(self.file_path, isNewFile=True)
         print("Data updated successfully.")
