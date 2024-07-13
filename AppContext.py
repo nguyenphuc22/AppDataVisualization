@@ -9,7 +9,7 @@ class AppContext():
         self.hyphothesisTitle = "Giả thuyết sử dụng OLS trên tập dữ liệu số lượng bản Lazada"
         self.hyphothesisContent = "Thông số OLS của mô hình là: 0.5, 0.6, 0.7, 0.8, 0.9"
         self.prompt = "Các thông số trên là giả định, không phải là thực tế. Hãy cho tôi biết nó nói lên điều gì ?"
-        self.isNewData = False
+
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
