@@ -7,6 +7,7 @@ from String import StringManager
 
 
 def visualizationProductScreen(strings: StringManager):
+    print("visualization Product Screen Entry")
     st.title(strings.get_string("data_visualization_title"))
     st.write(strings.get_string("data_visualization_message"))
 

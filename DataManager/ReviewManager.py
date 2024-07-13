@@ -103,6 +103,7 @@ class ReviewManager(AbstractDataManager):
         return re.sub(r'\.{2,}', ' ', text)
 
     def preprocessing(self, text):
+        print("Preprocessing data entry ReviewManager")
         text = str(text).lower()
         text = self.replace_dots(text)
         text = self.replace_star_icons(text)

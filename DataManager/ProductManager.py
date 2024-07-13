@@ -14,9 +14,18 @@ class ProductManager(AbstractDataManager):
         super().__init__()
 
     def preprocess_data(self, data):
-        df_good_products = data.groupby('itemId').first().reset_index()
-        df_good_products = df_good_products[~df_good_products['location'].str.contains('overseas', case=False)]
 
+        print("Preprocessing data entry Product")
+        try:
+            df_good_products = data.groupby('itemId').first().reset_index()
+        except KeyError:
+            raise ValueError("Required column 'itemId' is missing in the input data.")
+        
+        try:
+            df_good_products = df_good_products[~df_good_products['location'].str.contains('overseas', case=False)]
+        except KeyError:
+            print("Column 'location' is missing. Skipping this step.")
+        
         brand_replacements = {
             'xiao': 'Xiaomi',
             'OPPO': 'Oppo',

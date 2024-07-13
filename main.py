@@ -109,6 +109,7 @@ def main():
     chatbotView()
 
 if __name__ == "__main__":
+    print("Main Entry...")
     productManager.read_data("Data/filtered_data_product.xlsx")
     reviewManager.read_data("Data/filtered_data_review.xlsx")
     main()
