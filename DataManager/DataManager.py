@@ -15,13 +15,15 @@ class AbstractDataManager(ABC):
         return cls._instances[cls]
 
     def read_data(self, file_path):
-        self.file_path = file_path
-        data = pd.read_excel(file_path)
-        self.data = self.preprocess_data(data)
+        if self.data is None:
+            self.file_path = file_path
+            data = pd.read_excel(file_path)
+            self.data = self.preprocess_data(data)
         return self.data
 
     @abstractmethod
     def preprocess_data(self, data):
+        print("Preprocessing data entry Abstract")
         # This method should return a pandas DataFrame
         pass
 
