@@ -67,7 +67,7 @@ def hypothesisProductScreenPhuc(strings: StringManager):
     appContext.hyphothesisTitle = "Giả thuyết sử dụng OLS trên tập dữ liệu số lượng bản Lazada"
     # hpsContent sẽ là kết quả của mô hình OLS và kết luận từ mô hình
     hpsContent = (f"Kết quả mô hình OLS: \n {model.summary().as_text()} \n")
-
+ 
     appContext.hyphothesisContent = hpsContent
     appContext.prompt = "Dựa vào kết quả OLS bên trên, hãy nhận xét OLS cho tôi dạng markdown"
     response = openAi.generate_response(appContext)
