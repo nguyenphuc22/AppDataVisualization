@@ -97,17 +97,37 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     plt.xticks(rotation=30)
     plt.tight_layout()
     st.pyplot(fig)
-    st.markdown("""
-        **Nhận xét:** Thông qua các phương thức trực quan hóa nêu trên, 
-                nhóm rút ra được một số kết luận về sự quan tâm của các khách hàng như sau:
-        - 3 nhóm từ khóa mà các khách hàng quan tâm nhất khi mua sắm trực tuyến một sản phẩm 
-                điện tử là: chất lượng, dịch vụ, đặc điểm kỹ thuật.
-        - Chất lượng: các khách hàng thường có các nhận xét chung chung về sản phẩm như 'tốt', 'chất lượng', 'ok', 'ổn',...
-        - Dịch vụ: các khách hàng thường có nhiều sự quan tâm đến tốc độ giao hàng, 
-                hình thức đóng gói, sự nhiệt tình trong phản hồi và tư vấn của người bán.
-        - Đặc điểm kỹ thuật: đây là nhóm từ khóa có đa dạng các từ khóa con nhất, 
-                mà trong đó sự quan tâm nổi trội nhất của người dùng thường là 'pin', 'màn hình', 'sạc', 'màu', 'chụp',... 
-        """)
+
+    # Nhận xét động trực quan 2
+    top_features = feature_totals.sort_values(by='Count', ascending=False).reset_index(drop=True)
+    top_feature_names = top_features['Feature'].tolist()
+    top_counts = top_features['Count'].tolist()
+
+    # Xác định các nhóm từ khóa chính
+    most_mentioned_feature = top_feature_names[0]
+    second_most_feature = top_feature_names[1] if len(top_feature_names) > 1 else "không đủ dữ liệu"
+    third_most_feature = top_feature_names[2] if len(top_feature_names) > 2 else "không đủ dữ liệu"
+    fourth_most_feature = top_feature_names[3] if len(top_feature_names) > 3 else "không đủ dữ liệu"
+
+    most_mentioned_count = top_counts[0]
+    second_most_count = top_counts[1] if len(top_counts) > 1 else 0
+    third_most_count = top_counts[2] if len(top_counts) > 2 else 0
+    fourth_most_count = top_counts[3] if len(top_counts) > 3 else 0
+
+    # Nhận xét động
+    content2 = f"""Thông qua Biểu đồ cột biểu diễn tổng số lần xuất hiện của các nhóm từ khóa đánh giá sản phẩm, rút ra được một số kết luận về sự quan tâm của các khách hàng như sau:
+    
+    - Nhóm từ khóa '{most_mentioned_feature}' có tổng số lần xuất hiện cao nhất, với {int(most_mentioned_count)} lượt, cho thấy đây là yếu tố quan trọng nhất đối với khách hàng khi mua sắm sản phẩm điện tử.
+
+    - Tiếp theo là nhóm từ khóa '{second_most_feature}' với {int(second_most_count)} lượt, cho thấy sự quan tâm lớn của khách hàng đến yếu tố này.
+
+    - Nhóm từ khóa '{third_most_feature}' và '{fourth_most_feature}' lần lượt đứng thứ ba và thứ tư, với {int(third_most_count)} và {int(fourth_most_count)} lượt xuất hiện, cho thấy các yếu tố này cũng được khách hàng quan tâm nhưng không nhiều bằng hai yếu tố chính.
+    """
+
+    # st.markdown(f"""**Nhận xét:** 
+                
+    #             {content2}
+    #             """)
     
     # Visualization 3: Biểu đồ cột Keywords Count by Brand and Feature
     st.subheader('3. Biểu đồ cột biểu diễn tổng số lượng mỗi nhóm từ khóa cho từng nhãn hàng')
@@ -131,12 +151,41 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     plt.ylim(0, 2000)
     plt.grid(axis='y')
     st.pyplot(fig)
-    st.markdown("""
-        **Nhận xét:** Thông qua biểu đồ này, có thể nhận thấy các nhãn hàng nhận được nhiều bình luận liên quan 
-                đến các từ khóa đặc điểm sản phẩm, dịch vụ bao gồm Samsung, Apple, Oppo,... Bên cạnh đó, 
-                cũng tương tự như đối với toàn bộ các từ khóa, nhóm từ khóa liên quan đến chất lượng, đặc điểm 
-                kỹ thuật và dịch vụ là ba vấn đề mà người dùng quan tâm nhiều nhất trên đối tất cả các nhãn hiệu.
-        """)
+
+    # Nhận xét động trực quan 3
+    # Tính toán các thông số cần thiết
+    top_brands = plot_data.groupby('brandName')['Keywords Count'].sum().sort_values(ascending=False).reset_index()
+    top_brands_names = top_brands['brandName'].tolist()
+    top_brands_counts = top_brands['Keywords Count'].tolist()
+
+    # Xác định các thương hiệu hàng đầu
+    top_brand1 = top_brands_names[0]
+    top_brand2 = top_brands_names[1] if len(top_brands_names) > 1 else "không đủ dữ liệu"
+    top_brand3 = top_brands_names[2] if len(top_brands_names) > 2 else "không đủ dữ liệu"
+    top_brand4 = top_brands_names[3] if len(top_brands_names) > 3 else "không đủ dữ liệu"
+
+    top_brand1_count = top_brands_counts[0]
+    top_brand2_count = top_brands_counts[1] if len(top_brands_counts) > 1 else 0
+    top_brand3_count = top_brands_counts[2] if len(top_brands_counts) > 2 else 0
+
+    # Xác định các nhóm từ khóa chính cho các thương hiệu hàng đầu
+    top_features = plot_data.groupby('Feature')['Keywords Count'].sum().sort_values(ascending=False).reset_index()
+    top_feature_names = top_features['Feature'].tolist()
+    top_feature_counts = top_features['Keywords Count'].tolist()
+
+    # Nhận xét động
+    content3 = f"""Thông qua biểu đồ Biểu đồ cột biểu diễn tổng số lượng mỗi nhóm từ khóa cho từng nhãn hàng, rút ra được một số kết luận về sự quan tâm của khách hàng như sau:
+
+    - Thương hiệu '{top_brand1}' dẫn đầu với tổng số {int(top_brand1_count)} lượt xuất hiện các từ khóa, cho thấy đây là nhãn hàng nhận được nhiều sự quan tâm nhất.
+
+    - Tiếp theo là các thương hiệu '{top_brand2}' và '{top_brand3}' với tổng số lượt xuất hiện lần lượt là {int(top_brand2_count)} và {int(top_brand3_count)} lượt, cho thấy sự quan tâm lớn đến các nhãn hàng này.
+
+    - Các nhóm từ khóa chính mà khách hàng quan tâm bao gồm '{top_feature_names[0]}' với tổng số {int(top_feature_counts[0])} lượt, '{top_feature_names[1]}' và '{top_feature_names[2]}' cũng thu hút sự chú ý lớn, cho thấy sự quan tâm chủ yếu đến các yếu tố này.
+    """
+    # st.markdown(f"""**Nhận xét:** 
+                
+    #             {content3}
+    #             """)
     
     # Visualization 4: Biểu đồ tròn tỷ lệ đặc tính cho các brand hàng đầu
     st.subheader('4. Biểu đồ tròn biểu diễn tỷ lệ giữa các nhóm từ khóa cho từng nhãn hàng')
@@ -164,13 +213,45 @@ def hypothesisReviewScreenNhi(strings: StringManager):
         plt.tight_layout()
 
     st.pyplot(fig)
-    st.markdown("""
-        **Nhận xét:**
-        - Chất lượng luôn là đặc điểm được quan tâm nhiều nhất với tỷ lệ vượt trội trên 25% `so với toàn bộ các từ khóa.
-        - Các khách hàng của nhãn hàng Samsung nhắc nhiều về các từ khóa dịch vụ hơn đặc điểm kỹ thuật, với sự chênh lệch xấp xỉ 4%.
-        - Các khách hàng của Apple và Oppo nhắc đến nhiều về các đặc điểm kỹ thuật hơn, mà trong đó sự chênh lệch giữa hai đặc điểm này ở Apple là 1.5\% và khoảng 3\% đối với Oppo.
-        - Trong khi đó, 4 đặc điểm còn lại có tổng số phần trăm từ khóa chỉ chiếm khoảng 30\%.
-        """)
+
+    # Nhận xét động trực quan 4
+    # Tính toán các tỷ lệ phần trăm và sự chênh lệch
+    top_brand = df_feature_counts.index[0]
+    top_feature = df_feature_counts.loc[top_brand].idxmax()
+    top_feature_percentage = df_feature_counts.loc[top_brand].max() / df_feature_counts.loc[top_brand].sum() * 100
+
+    brand_1 = df_feature_counts.index[0]
+    brand_2 = df_feature_counts.index[1]
+    brand_3 = df_feature_counts.index[2]
+
+    # Tìm kiếm các đặc điểm được nhắc đến nhiều nhất
+    brand_1_top_feature = df_feature_counts.loc[brand_1].idxmax()
+    brand_1_second_top_feature = df_feature_counts.loc[brand_1].nlargest(2).index[1]
+    brand_1_diff = df_feature_counts.loc[brand_1, brand_1_top_feature] - df_feature_counts.loc[brand_1, brand_1_second_top_feature]
+    brand_1_diff_percentage = brand_1_diff / df_feature_counts.loc[brand_1].sum() * 100
+
+    brand_2_top_feature = df_feature_counts.loc[brand_2].idxmax()
+    brand_2_second_top_feature = df_feature_counts.loc[brand_2].nlargest(2).index[1]
+    brand_2_diff_percentage = abs(df_feature_counts.loc[brand_2, brand_2_top_feature] - df_feature_counts.loc[brand_2, brand_2_second_top_feature]) / df_feature_counts.loc[brand_2].sum() * 100
+
+    brand_3_top_feature = df_feature_counts.loc[brand_3].idxmax()
+    brand_3_second_top_feature = df_feature_counts.loc[brand_3].nlargest(2).index[1]
+    brand_3_diff_percentage = abs(df_feature_counts.loc[brand_3, brand_3_top_feature] - df_feature_counts.loc[brand_3, brand_3_second_top_feature]) / df_feature_counts.loc[brand_3].sum() * 100
+
+    content4 = f""" Thông qua Biểu đồ tròn biểu diễn tỷ lệ giữa các nhóm từ khóa cho từng nhãn hàng, rút ra được một số kết luận về sự quan tâm của khách hàng như sau:
+
+    - '{top_feature}' luôn là đặc điểm được quan tâm nhiều nhất với tỷ lệ vượt trội trên {top_feature_percentage:.1f}% so với toàn bộ các từ khóa.
+        
+    - Các khách hàng của nhãn hàng {brand_1} nhắc nhiều về các từ khóa '{brand_1_top_feature}' hơn '{brand_1_second_top_feature}', với sự chênh lệch xấp xỉ {brand_1_diff_percentage:.1f}%.
+        
+    - Các khách hàng của {brand_2} nhắc đến nhiều về các đặc điểm '{brand_2_top_feature}' hơn, mà trong đó sự chênh lệch giữa hai đặc điểm này ở {brand_2} là {brand_2_diff_percentage:.1f}%.
+    
+    - Tiếp theo khách hàng của {brand_3} nhắc đến nhiều về các đặc điểm '{brand_3_top_feature}' hơn, mà trong đó sự chênh lệch giữa hai đặc điểm này ở {brand_3} là {brand_3_diff_percentage:.1f}%.
+    """
+    # st.markdown(f""" **Nhận xét:**
+                
+    #             {content4}""")
+
 
     # Visualization 5: Biểu đồ cột tỷ lệ nhắc đến các đặc tính trong mỗi bình luận của các brand name
     st.subheader('5. Biểu đồ biểu diễn xác suất xuất hiện từ khóa trong mỗi bình luận cho từng nhãn hàng')
@@ -195,17 +276,33 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     plt.grid(axis='y')
     st.pyplot(fig)
 
-    st.markdown("""
-        **Nhận xét:**
-        - Chất lượng: Apple và Samsung có tỷ lệ nhắc đến chất lượng cao nhất,
-                 cho thấy người tiêu dùng rất chú trọng đến chất lượng khi đánh giá các sản phẩm của hai nhãn hiệu này.
-        - Thiết kế: Oppo có tỷ lệ nhắc đến thiết kế cao hơn so với Apple và Samsung, 
-                cho thấy người tiêu dùng rất quan tâm đến thiết kế của sản phẩm Oppo.
-        - Đặc điểm kỹ thuật: Đặc điểm kỹ thuật được nhắc đến nhiều ở Oppo và Samsung, 
-                cho thấy sự quan tâm lớn đến tính năng kỹ thuật của sản phẩm từ hai nhãn hiệu này.
-        - Dịch vụ: Tỷ lệ nhắc đến dịch vụ khá cao ở Apple và Samsung, cho thấy chất lượng dịch vụ 
-                là một yếu tố quan trọng trong các đánh giá của người tiêu dùng.
-        """)
+    # Nhận xét động hình ảnh trực quan 5
+    # Tìm các nhãn hàng và đặc tính được nhắc đến nhiều nhất
+    top_features = brand_feature_ratios.max().sort_values(ascending=False).index[:4]
+    top_features_brands = {feature: brand_feature_ratios[feature].idxmax() for feature in top_features}
+    top_features_ratios = {feature: brand_feature_ratios[feature].max() * 100 for feature in top_features}
+
+    # Lấy nhãn hàng và tỷ lệ cho các đặc tính khác
+    second_highest_ratios = {
+        feature: brand_feature_ratios[feature].nlargest(2).values[1] * 100 for feature in top_features
+    }
+    second_highest_brands = {
+        feature: brand_feature_ratios[feature].nlargest(2).index[1] for feature in top_features
+    }
+
+    content5 = f""" Thông qua Biểu đồ biểu diễn xác suất xuất hiện từ khóa trong mỗi bình luận cho từng nhãn hàng, rút ra được một số kết luận về sự quan tâm của khách hàng như sau:
+
+    - '{top_features[0]}': {top_features_brands[top_features[0]]} và {second_highest_brands[top_features[0]]} có tỷ lệ nhắc đến '{top_features[0]}' cao nhất, cho thấy người tiêu dùng rất chú trọng đến {top_features[0]} khi đánh giá các sản phẩm của hai nhãn hiệu này, với tỷ lệ lần lượt là {top_features_ratios[top_features[0]]:.1f}% và {second_highest_ratios[top_features[0]]:.1f}%.
+        
+    - '{top_features[1]}': {top_features_brands[top_features[1]]} có tỷ lệ nhắc đến '{top_features[1]}' cao hơn so với các nhãn hàng khác, cho thấy người tiêu dùng rất quan tâm đến '{top_features[1]}' của sản phẩm {top_features_brands[top_features[1]]}, với tỷ lệ là {top_features_ratios[top_features[1]]:.1f}%.
+        
+    - '{top_features[2]}': '{top_features[2]}' được nhắc đến nhiều ở {top_features_brands[top_features[2]]}, cho thấy sự quan tâm lớn đến '{top_features[2]}' của sản phẩm từ nhãn hiệu này, với tỷ lệ là {top_features_ratios[top_features[2]]:.1f}%.
+        
+    - '{top_features[3]}': Tỷ lệ nhắc đến '{top_features[3]}' khá cao ở {top_features_brands[top_features[3]]} và {second_highest_brands[top_features[3]]}, cho thấy '{top_features[3]}' là một yếu tố quan trọng trong các đánh giá của người tiêu dùng, với tỷ lệ lần lượt là {top_features_ratios[top_features[3]]:.1f}% và {second_highest_ratios[top_features[3]]:.1f}%.
+    """
+    # st.markdown(f""" **Nhận xét:**
+                
+    #             {content5}""")
     
     openAi = OpenAIChatbot()
     appContext = AppContext.get_instance()
@@ -214,21 +311,21 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     appContext.hyphothesisTitle = "Trích xuất & phân tích những đặc điểm của sản phẩm thường được nhắc đến trong review"
 
     # hpsContent sẽ là kết quả của phân tích
-    hpsContent = (f"""Dưới đây là các nhóm từ khóa chính được phân tích, mỗi nhóm phản ánh một khía cạnh quan trọng của sản phẩm hoặc dịch vụ:
+    hpsContent = (f"""
+    1. Hình ảnh trực quan 1: Mô hình đám mây từ cho các từ khóa đánh giá sản phẩm
                   
-            - Chất lượng: Các từ khóa này phản ánh cảm nhận của khách hàng về độ bền, độ tin cậy và chất lượng tổng thể của sản phẩm. Chúng cho biết mức độ hài lòng hoặc không hài lòng của khách hàng về chất lượng sản phẩm.
-                  
-            - Giá cả: Nhóm từ khóa này cho thấy sự quan tâm của khách hàng về mặt giá cả và chi phí. Nó giúp doanh nghiệp hiểu được mức độ hài lòng của khách hàng về giá trị mà họ nhận được so với số tiền bỏ ra.
-                  
-            - Thiết kế: Các từ khóa này phản ánh cảm nhận của khách hàng về thiết kế và hình thức của sản phẩm. Chúng giúp xác định mức độ ưa chuộng về mặt thẩm mỹ và kiểu dáng của sản phẩm.
-                  
-            - Hiệu năng: Nhóm từ khóa này liên quan đến hiệu suất và tốc độ hoạt động của sản phẩm. Nó cho thấy mức độ hài lòng của khách hàng về khả năng đáp ứng và vận hành của sản phẩm.
-                  
-            - Đặc điểm kỹ thuật: Các từ khóa này phản ánh những đặc điểm và tính năng kỹ thuật của sản phẩm. Chúng cho biết mức độ hài lòng của khách hàng về các tính năng cụ thể và hiệu quả của chúng.
-                  
-            - Dịch vụ: Nhóm từ khóa này liên quan đến dịch vụ khách hàng và hậu mãi. Nó giúp đánh giá chất lượng dịch vụ, sự hỗ trợ và mức độ hài lòng của khách hàng về dịch vụ mà họ nhận được.
-                  
-            - Tình trạng sản phẩm: Các từ khóa này phản ánh tình trạng thực tế của sản phẩm khi đến tay khách hàng. Nó giúp xác định các vấn đề liên quan đến tình trạng mới, cũ, hoặc hư hỏng của sản phẩm.""")
+    2. Hình ảnh trực quan 2:
+    {content2}
+
+    3. Hình ảnh trực quan 3:
+    {content3}
+
+    4. Hình ảnh trực quan 4:
+    {content4}
+
+    5. Hình ảnh trực quan 5:
+    {content5}
+    """)
     appContext.hyphothesisContent = hpsContent
     appContext.prompt = "Dựa vào giả thuyết đặc điểm của sản phẩm thường được nhắc đến trong review trên hãy nhận xét cho tôi dạng markdown"
     response = openAi.generate_response(appContext) 
