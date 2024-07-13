@@ -63,7 +63,26 @@ class ReviewManager(AbstractDataManager):
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
-    # Load dữ liệu stopwords
+
+    def check_format(self, data):
+        required_columns = ['reviewRateId', 'boughtDate', 'reviewContent', 'reviewTime', 'rating', 
+                            'likeCount', 'likeText', 'helpful', 'isPurchased', 'isGuest', 
+                            'sellerId', 'sellerName', 'itemId', 'itemTitle', 'skuInfo', 
+                            'skuId', 'upVotes', 'downVotes', 'isGoodReview']
+
+        # Convert both lists to lowercase for a case-insensitive comparison
+        required_columns_lower = [col.lower() for col in required_columns]
+        data_columns_lower = [col.lower() for col in data.columns]
+
+        # Debugging: Print columns for verification
+        print("Required columns (lowercase):", required_columns_lower)
+        print("Data columns (lowercase):", data_columns_lower)
+
+        if all(col in data.columns for col in required_columns):
+            return {'valid': True, 'type': 'review'}
+        else:
+            return {'valid': False}
+
     def load_stopwords(self, file_path):
         with open(file_path, 'r', encoding='utf-8') as f:
             return set(f.read().splitlines())
