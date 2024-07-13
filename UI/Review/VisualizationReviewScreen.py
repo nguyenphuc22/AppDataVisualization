@@ -60,7 +60,7 @@ def visualizationReviewScreen(strings: StringManager):
         ax.set_ylabel(y_column)
     else:  # "Word Cloud"
         text = ' '.join(data[review_content_column].dropna())
-        wordcloud = WordCloud(width=800, height=400, background_color='white').generate(text)
+        wordcloud = WordCloud(width=800, height=800, background_color='white').generate(text)
 
         plt.figure(figsize=(10, 6))
         plt.imshow(wordcloud, interpolation='bilinear')

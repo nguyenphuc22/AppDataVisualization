@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from AppContext import AppContext
 from String import StringManager
 from DataManager.ReviewManager import ReviewManager
+from ChatBot import OpenAIChatbot
 
 def hypothesisReviewScreenVien(strings: StringManager):
     print("Hypothesis Review Screen Vien Entry")
@@ -124,6 +125,7 @@ def hypothesisReviewScreenVien(strings: StringManager):
     """)
 
     # Cập nhật AppContext
+    openAi = OpenAIChatbot()
     appContext = AppContext.get_instance()
     appContext.titlePage = strings.get_string("review_hypothesis_title")[1]
     appContext.content = "Đây là phần phân tích cảm xúc của người dùng có tác động như thế nào đến đánh giá và các nhãn hàng lớn trên thế giới."
@@ -156,6 +158,10 @@ def hypothesisReviewScreenVien(strings: StringManager):
     - 2 thương hiệu lớn Apple và Samsung vẫn đang giữ vị thế vững chắc nhưng đang phải đối mặt cao sự kỳ vọng của người dùng.
     """)
     appContext.hyphothesisContent = hpsContent
+    appContext.prompt = "Hãy nhận xét giả thuyết phân tích cảm xúc của người dùng có tác động như thế nào đến đánh giá và các nhãn hàng lớn trên thế giới cho tôi dạng markdown"
+    response = openAi.generate_response(appContext)
+
+    st.markdown(response)
 
 # Các hàm hỗ trợ 
 def percentstandardize_barplot(x, y, hue, data, ax=None, order=None):

@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from AppContext import AppContext
 from String import StringManager
 from DataManager.ReviewManager import ReviewManager
+from ChatBot import OpenAIChatbot
 
 def hypothesisReviewScreenNhi(strings: StringManager):
     print("Hypothesis Review Screen Nhi Entry")
@@ -206,10 +207,11 @@ def hypothesisReviewScreenNhi(strings: StringManager):
                 là một yếu tố quan trọng trong các đánh giá của người tiêu dùng.
         """)
     
+    openAi = OpenAIChatbot()
     appContext = AppContext.get_instance()
     appContext.titlePage = strings.get_string("review_hypothesis_title")[0]
     appContext.content = "Đây là trích xuất & phân tích những đặc điểm của sản phẩm thường được nhắc đến trong review"
-    appContext.hyphothesisTitle = "Từ đây ta đưa ra dược các nhận xét như sau"
+    appContext.hyphothesisTitle = "Trích xuất & phân tích những đặc điểm của sản phẩm thường được nhắc đến trong review"
 
     # hpsContent sẽ là kết quả của phân tích
     hpsContent = (f"""Dưới đây là các nhóm từ khóa chính được phân tích, mỗi nhóm phản ánh một khía cạnh quan trọng của sản phẩm hoặc dịch vụ:
@@ -228,6 +230,10 @@ def hypothesisReviewScreenNhi(strings: StringManager):
                   
             - Tình trạng sản phẩm: Các từ khóa này phản ánh tình trạng thực tế của sản phẩm khi đến tay khách hàng. Nó giúp xác định các vấn đề liên quan đến tình trạng mới, cũ, hoặc hư hỏng của sản phẩm.""")
     appContext.hyphothesisContent = hpsContent
+    appContext.prompt = "Dựa vào giả thuyết đặc điểm của sản phẩm thường được nhắc đến trong review trên hãy nhận xét cho tôi dạng markdown"
+    response = openAi.generate_response(appContext) 
+
+    st.markdown(response)
 
 # Các hàm hỗ trợ
 def count_words(content_column):
