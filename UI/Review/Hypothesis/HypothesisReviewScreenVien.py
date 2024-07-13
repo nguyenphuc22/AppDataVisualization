@@ -11,9 +11,9 @@ from DataManager.ReviewManager import ReviewManager
 
 def hypothesisReviewScreenVien(strings: StringManager):
     print("Hypothesis Review Screen Vien Entry")
-
-    st.title(strings.get_string("hypothesis_title"))
-    st.write(strings.get_string("review_hypothesis_title")[1])
+    st.title(strings.get_string("review_hypothesis_title")[1])
+    # st.title(strings.get_string("hypothesis_title"))
+    # st.write(strings.get_string("review_hypothesis_title")[1])
 
     # Lấy instance của ReviewManager
     review_manager = ReviewManager.get_instance()
@@ -28,7 +28,7 @@ def hypothesisReviewScreenVien(strings: StringManager):
     # st.write(review_manager.get_data_summary())
 
     # Visualization 1: Cảm xúc tổng thể
-    st.subheader("Các cảm xúc tổng thể")
+    st.subheader("1. Các cảm xúc tổng thể")
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.countplot(x="Sentiment", data=df_new, ax=ax, order=["Negative", "Neutral", "Positive"], palette="viridis")
     ax.set_xlabel("Cảm xúc", fontsize=12)
@@ -42,7 +42,7 @@ def hypothesisReviewScreenVien(strings: StringManager):
     """)
 
     # Visualization 2: Đánh giá tổng thể
-    st.subheader("Các đánh giá tổng thể")
+    st.subheader("2. Các đánh giá tổng thể")
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.countplot(x="rating", data=df_new, ax=ax, palette="viridis")
     ax.set_xlabel("Đánh giá", fontsize=12)
@@ -54,7 +54,7 @@ def hypothesisReviewScreenVien(strings: StringManager):
     """)
 
     # Visualization 3: Tần suất đánh giá theo cảm xúc
-    st.subheader("Tần suất đánh giá (%) theo cảm xúc")
+    st.subheader("3. Tần suất đánh giá (%) theo cảm xúc")
     fig, ax = plt.subplots(figsize=(12, 8))
     percentstandardize_barplot(x="rating", y="Percentage", hue="Sentiment", data=df_new, ax=ax)
     ax.set_xlabel("Đánh giá")
@@ -69,7 +69,7 @@ def hypothesisReviewScreenVien(strings: StringManager):
     """)
 
     # Visualizatin 4: Word Clouds và Top Words
-    st.subheader("Phân tích từ ngữ")
+    st.subheader("4. Phân tích từ ngữ")
     col1, col2 = st.columns(2)
 
     with col1:
@@ -103,7 +103,7 @@ def hypothesisReviewScreenVien(strings: StringManager):
                """)
 
     # Visulisation 5: Phân tích cảm xúc theo thương hiệu
-    st.subheader("Tỷ lệ phần trăm theo cảm xúc cho từng thương hiệu")
+    st.subheader("5. Tỷ lệ phần trăm theo cảm xúc cho từng thương hiệu")
     sentiment_percent = calculate_sentiment_percentage(df_new)
     fig, ax = plt.subplots(figsize=(14, 10))
     sentiment_percent.plot(kind='bar', stacked=True, colormap='plasma', ax=ax, edgecolor='black')
@@ -115,8 +115,8 @@ def hypothesisReviewScreenVien(strings: StringManager):
     st.markdown("""
     **Nhận xét:** 
     - Tỷ lệ đánh giá tích cực vượt trội hoàn toàn so với tiêu cực.
-    - Realme dẫn đầu ở mức tầm 95'%' cảm xúc tích cực. Theo sau là các hãng LG, Sony, Vsmart là trên 90'%'. 
-                Tiếp theo là Apple, Samsung và các hãng khác nằm trong khoảng 80-90'%' .
+    - Realme dẫn đầu ở mức tầm 95% 'cảm xúc tích cực. Theo sau là các hãng LG, Sony, Vsmart là trên 90%. 
+                Tiếp theo là Apple, Samsung và các hãng khác nằm trong khoảng 80-90%.
     - Huawei và Xiaomi có điểm đánh giá tiêu cực cao nhất. Hãng đang đối với mặt với một vài thách thức về 
                 hình ảnh và sự hài lòng của khách hàng
     - Các hãng của Trung Quốc như Realme, Oppo, Vivo đang tạo ấn tượng tốt với khách hàng.
