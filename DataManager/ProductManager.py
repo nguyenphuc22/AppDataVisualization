@@ -13,9 +13,32 @@ class ProductManager(AbstractDataManager):
     def __init__(self):
         super().__init__()
 
+    def check_format(self, data):
+        required_columns = ['itemid', 'name', 'priceshow', 'discount', 'ratingscore', 'review',
+                            'location', 'sellername', 'sellerid', 'brandname', 'brandid',
+                            'price', 'category', 'originalprice', 'itemsoldcntshow', 'options']
+
+        # Convert both lists to lowercase for a case-insensitive comparison
+        required_columns_lower = [col.lower() for col in required_columns]
+        data_columns_lower = [col.lower() for col in data.columns]
+
+        # Debugging: Print columns for verification
+        print("Required columns (lowercase):", required_columns_lower)
+        print("Data columns (lowercase):", data_columns_lower)
+
+        # Check if all required columns are present in data.columns, case-insensitively
+        if all(col in data_columns_lower for col in required_columns_lower):
+            print("All required columns are present.")
+            return {'valid': True, 'type': 'product'}
+        else:
+            print("Missing one or more required columns.")
+            return {'valid': False}
+
     def preprocess_data(self, data):
 
+
         print("Preprocessing data entry Product")
+
         try:
             df_good_products = data.groupby('itemId').first().reset_index()
         except KeyError:
@@ -25,7 +48,7 @@ class ProductManager(AbstractDataManager):
             df_good_products = df_good_products[~df_good_products['location'].str.contains('overseas', case=False)]
         except KeyError:
             print("Column 'location' is missing. Skipping this step.")
-        
+
         brand_replacements = {
             'xiao': 'Xiaomi',
             'OPPO': 'Oppo',
@@ -33,8 +56,12 @@ class ProductManager(AbstractDataManager):
             'vsmart': 'Vsmart',
             'NaN': 'No Brand'
         }
-        df_good_products.loc[:, 'brandName'] = df_good_products['brandName'].replace(brand_replacements)
-
+        
+        try:
+            df_good_products['brandName'] = df_good_products['brandName'].replace(brand_replacements)
+        except KeyError:
+            print("Column 'brandName' is missing. Skipping this step.")
+        
         brand_patterns = {
             'Realme': [r'realme'],
             'Nokia': [r'nokia'],
@@ -54,37 +81,51 @@ class ProductManager(AbstractDataManager):
             'Samsung': [r'j\d{1}', r'sam', r'galaxy', r'[sS]\d{2}'],
         }
 
-        df_good_products.loc[:, 'brandName'] = df_good_products.apply(
-            lambda row: self.update_brand_name(row['name'], row['brandName'], brand_patterns), axis=1
-        )
-
-        df_good_products = df_good_products[df_good_products['brandName'] != 'No Brand']
-        df_good_products.loc[:, 'brandName'] = df_good_products['brandName'].str.capitalize()
-
-        bad_keywords = ['tablets', 'vitamin', 'pen']
-        df_good_products = df_good_products[~df_good_products['name'].str.contains('|'.join(bad_keywords), case=False, na=False)]
-
-        '''Remove brand that has devices <= 10'''
-        brand_counts = df_good_products['brandName'].value_counts()
-        brands_to_remove = brand_counts[brand_counts <= 10].index.tolist()
-        df_good_products = df_good_products[~df_good_products['brandName'].isin(brands_to_remove)]
-
-        '''Reformat the rating system to correct format and replace NaN value'''
-        df_good_products['ratingScore'] = df_good_products['ratingScore'].fillna(0)
-
-        '''Update originalPrice where originalPrice < priceShow'''
-        df_good_products.loc[df_good_products['originalPrice'] < df_good_products['priceShow'], 'originalPrice'] = df_good_products['priceShow']
-
-        '''Drop column price because they are similar to priceShow'''
-        df_good_products.drop(columns=['price'], inplace=True)
-
-        '''Reformat the rating system to correct format'''
-        df_good_products['ratingScore'] = df_good_products['ratingScore'].apply(lambda score: round(float(score), 3))
-
-        '''reset index'''
+        try:
+            df_good_products['brandName'] = df_good_products.apply(
+                lambda row: self.update_brand_name(row['name'], row['brandName'], brand_patterns), axis=1
+            )
+        except KeyError:
+            print("Column 'name' or 'brandName' is missing. Skipping this step.")
+        
+        try:
+            df_good_products = df_good_products[df_good_products['brandName'] != 'No Brand']
+            df_good_products['brandName'] = df_good_products['brandName'].str.capitalize()
+        except KeyError:
+            print("Column 'brandName' is missing. Skipping this step.")
+        
+        try:
+            bad_keywords = ['tablets', 'vitamin', 'pen']
+            df_good_products = df_good_products[~df_good_products['name'].str.contains('|'.join(bad_keywords), case=False, na=False)]
+        except KeyError:
+            print("Column 'name' is missing. Skipping this step.")
+        
+        try:
+            brand_counts = df_good_products['brandName'].value_counts()
+            brands_to_remove = brand_counts[brand_counts <= 10].index.tolist()
+            df_good_products = df_good_products[~df_good_products['brandName'].isin(brands_to_remove)]
+        except KeyError:
+            print("Column 'brandName' is missing. Skipping this step.")
+        
+        try:
+            df_good_products['ratingScore'] = df_good_products['ratingScore'].fillna(0)
+            df_good_products['ratingScore'] = df_good_products['ratingScore'].apply(lambda score: round(float(score), 3))
+        except KeyError:
+            print("Column 'ratingScore' is missing. Skipping this step.")
+        
+        try:
+            df_good_products.loc[df_good_products['originalPrice'] < df_good_products['priceShow'], 'originalPrice'] = df_good_products['priceShow']
+        except KeyError:
+            print("Column 'originalPrice' or 'priceShow' is missing. Skipping this step.")
+        
+        try:
+            df_good_products.drop(columns=['price'], inplace=True)
+        except KeyError:
+            print("Column 'price' is missing. Skipping this step.")
+        
+        # Reset index
         df_good_products.reset_index(drop=True, inplace=True)
 
-        # return data
         return df_good_products
 
     def get_data(self):

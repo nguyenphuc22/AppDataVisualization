@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
 from String import StringManager
+from DataManager.ProductManager import ProductManager  # Import ProductManager
+from DataManager.ReviewManager import ReviewManager  # Import ReviewManager
+
 
 def uploadFilesView(strings: StringManager):
     # Initialize session state for file uploader key
@@ -20,6 +23,38 @@ def uploadFilesView(strings: StringManager):
         if st.sidebar.button(strings.get_string("update_button")):
             # Change the file uploader key
             st.session_state['file_uploader_key'] = f"file_uploader_{hash(str(st.session_state['file_uploader_key']))}"
-            # TODO: Cập nhật file mới vào data nhé Bình
-            st.experimental_rerun()
+            # TODO: Update the new file into data
+            # Change the file uploader key to force re-render
+            st.session_state['file_uploader_key'] = f"file_uploader_{hash(str(st.session_state['file_uploader_key']))}"
 
+            # Process the uploaded file based on its type
+            if uploaded_file.type == 'text/csv':
+                new_data = pd.read_csv(uploaded_file)
+            elif uploaded_file.type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+                new_data = pd.read_excel(uploaded_file)
+            else:
+                st.sidebar.error(strings.get_string("unsupported_file_type"))
+                return
+
+            # Update the ProductManager or ReviewManager with the new data
+            try:
+                result = None
+                if 'reviewContent' in new_data.columns:
+                    review_manager = ReviewManager.get_instance()
+                    result = review_manager.check_format(new_data)
+                else:
+                    product_manager = ProductManager.get_instance()
+                    result = product_manager.check_format(new_data)
+
+                if result['valid']:
+                    st.session_state['file_type'] = result['type']
+                    if result['type'] == 'review':
+                        review_manager.update_data(new_data)
+                    elif result['type'] == 'product':
+                        product_manager.update_data(new_data)
+                    st.sidebar.text(f"{strings.get_string('update_success')} {uploaded_file.name}")
+                else:
+                    st.sidebar.error(f"{strings.get_string('wrong_format')} {uploaded_file.name}")
+
+            except ValueError as e:
+                st.error(f"Error: {e}")

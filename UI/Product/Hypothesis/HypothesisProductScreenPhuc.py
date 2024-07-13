@@ -7,8 +7,10 @@ import matplotlib.pyplot as plt
 from statsmodels.formula.api import ols
 import seaborn as sns
 
+
 def hypothesisProductScreenPhuc(strings: StringManager):
     print("Hypothesis Product Screen Phuc Entry")
+
     st.title(strings.get_string("product_hypothesis_title")[0])
 
     productManager = ProductManager.get_instance()
@@ -72,4 +74,6 @@ def hypothesisProductScreenPhuc(strings: StringManager):
     # hpsContent sẽ là kết quả của mô hình OLS và kết luận từ mô hình
     hpsContent = (f"Kết quả mô hình OLS: \n {model.summary().as_text()} \n "
                   f"\n Kết luận: \n{conclusions}")
+
     appContext.hyphothesisContent = hpsContent
+
