@@ -11,9 +11,9 @@ from DataManager.ReviewManager import ReviewManager
 
 def hypothesisReviewScreenNhi(strings: StringManager):
     print("Hypothesis Review Screen Nhi Entry")
-
-    st.title(strings.get_string("hypothesis_title"))
-    st.write(strings.get_string("review_hypothesis_title")[0])
+    st.title(strings.get_string("review_hypothesis_title")[0])
+    # st.title(strings.get_string("hypothesis_title"))
+    # st.write(strings.get_string("review_hypothesis_title")[0])
 
     # Lấy instance của ReviewManager
     review_manager = ReviewManager.get_instance()
@@ -58,6 +58,7 @@ def hypothesisReviewScreenNhi(strings: StringManager):
         word_counts[word] += count
 
     # Visualization 1: Word Clouds cho từng đặc điểm và tổng hợp
+    st.subheader('1. Mô hình đám mây từ cho các từ khóa đánh giá sản phẩm')
     wordcloud_all = WordCloud(width=800, height=600, background_color='white', colormap='plasma').generate_from_frequencies(word_counts)
     fig, axs = plt.subplots(2, 4, figsize=(20, 10))
     fig.suptitle('Word Clouds cho từng đặc điểm và tổng hợp')
@@ -73,11 +74,12 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     axs[1, 3].axis('off')
 
     st.pyplot(fig)
-    st.markdown("""
-        **Nhận xét:**
-        """)
+    # st.markdown("""
+    #     **Nhận xét:**
+    #     """)
     
     # Visualization 2: Biểu đồ cột tổng Count cho mỗi Feature
+    st.subheader('2. Biểu đồ cột biểu diễn tổng số lần xuất hiện của các nhóm từ khóa đánh giá sản phẩm')
     feature_totals = filtered_words_df.groupby('Feature')['Count'].sum().reset_index()
     fig, ax = plt.subplots(figsize=(10, 6))
     bars = ax.bar(feature_totals['Feature'], feature_totals['Count'], color='skyblue')
@@ -95,10 +97,19 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     plt.tight_layout()
     st.pyplot(fig)
     st.markdown("""
-        **Nhận xét:**
+        **Nhận xét:** Thông qua các phương thức trực quan hóa nêu trên, 
+                nhóm rút ra được một số kết luận về sự quan tâm của các khách hàng như sau:
+        - 3 nhóm từ khóa mà các khách hàng quan tâm nhất khi mua sắm trực tuyến một sản phẩm 
+                điện tử là: chất lượng, dịch vụ, đặc điểm kỹ thuật.
+        - Chất lượng: các khách hàng thường có các nhận xét chung chung về sản phẩm như 'tốt', 'chất lượng', 'ok', 'ổn',...
+        - Dịch vụ: các khách hàng thường có nhiều sự quan tâm đến tốc độ giao hàng, 
+                hình thức đóng gói, sự nhiệt tình trong phản hồi và tư vấn của người bán.
+        - Đặc điểm kỹ thuật: đây là nhóm từ khóa có đa dạng các từ khóa con nhất, 
+                mà trong đó sự quan tâm nổi trội nhất của người dùng thường là 'pin', 'màn hình', 'sạc', 'màu', 'chụp',... 
         """)
     
     # Visualization 3: Biểu đồ cột Keywords Count by Brand and Feature
+    st.subheader('3. Biểu đồ cột biểu diễn tổng số lượng mỗi nhóm từ khóa cho từng nhãn hàng')
     for feature, keywords in product_features.items():
         df_new[feature + '_count'] = df_new['cleanedContent'].apply(lambda x: count_keywords(keywords, x))
 
@@ -120,11 +131,15 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     plt.grid(axis='y')
     st.pyplot(fig)
     st.markdown("""
-        **Nhận xét:**
+        **Nhận xét:** Thông qua biểu đồ này, có thể nhận thấy các nhãn hàng nhận được nhiều bình luận liên quan 
+                đến các từ khóa đặc điểm sản phẩm, dịch vụ bao gồm Samsung, Apple, Oppo,... Bên cạnh đó, 
+                cũng tương tự như đối với toàn bộ các từ khóa, nhóm từ khóa liên quan đến chất lượng, đặc điểm 
+                kỹ thuật và dịch vụ là ba vấn đề mà người dùng quan tâm nhiều nhất trên đối tất cả các nhãn hiệu.
         """)
     
     # Visualization 4: Biểu đồ tròn tỷ lệ đặc tính cho các brand hàng đầu
-    top_brands = df_new['brandName'].value_counts().nlargest(6).index.tolist()
+    st.subheader('4. Biểu đồ tròn biểu diễn tỷ lệ giữa các nhóm từ khóa cho từng nhãn hàng')
+    top_brands = df_new['brandName'].value_counts().nlargest(3).index.tolist()
     df_top = df_new[df_new['brandName'].isin(top_brands)]
 
     feature_columns = ['chất lượng_count', 'giá cả_count', 'thiết kế_count', 'hiệu năng_count', 'đặc điểm kỹ thuật_count', 'dịch vụ_count', 'tình trạng sản phẩm_count']
@@ -135,23 +150,29 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     df_feature_counts = df_feature_counts.sort_values(by='tổng giá trị', ascending=False)
     df_feature_counts = df_feature_counts.drop(columns=['tổng giá trị'])
    
-    fig, axs = plt.subplots(2, 3, figsize=(20, 12))
+
+    fig, axs = plt.subplots(1, 3, figsize=(20, 6))  # Tạo một hàng với 3 biểu đồ
     fig.suptitle('Biểu đồ tỷ lệ đặc tính cho các brand hàng đầu')
     colors = plt.cm.Set2.colors
 
-    for i, brand in enumerate(df_feature_counts.index):
+    for i, brand in enumerate(df_feature_counts.index[:3]):  # Chỉ lấy 3 brand đầu tiên
         sizes = df_feature_counts.loc[brand].values
         labels = df_feature_counts.columns
-        axs[i//3, i%3].pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90, colors=colors)
-        axs[i//3, i%3].set_title(f'Biểu đồ tỷ lệ của {brand}')
+        axs[i].pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90, colors=colors)
+        axs[i].set_title(f'Biểu đồ tỷ lệ của {brand}')
+        plt.tight_layout()
 
-    plt.tight_layout()
     st.pyplot(fig)
     st.markdown("""
         **Nhận xét:**
+        - Chất lượng luôn là đặc điểm được quan tâm nhiều nhất với tỷ lệ vượt trội trên 25% `so với toàn bộ các từ khóa.
+        - Các khách hàng của nhãn hàng Samsung nhắc nhiều về các từ khóa dịch vụ hơn đặc điểm kỹ thuật, với sự chênh lệch xấp xỉ 4%.
+        - Các khách hàng của Apple và Oppo nhắc đến nhiều về các đặc điểm kỹ thuật hơn, mà trong đó sự chênh lệch giữa hai đặc điểm này ở Apple là 1.5\% và khoảng 3\% đối với Oppo.
+        - Trong khi đó, 4 đặc điểm còn lại có tổng số phần trăm từ khóa chỉ chiếm khoảng 30\%.
         """)
 
     # Visualization 5: Biểu đồ cột tỷ lệ nhắc đến các đặc tính trong mỗi bình luận của các brand name
+    st.subheader('5. Biểu đồ biểu diễn xác suất xuất hiện từ khóa trong mỗi bình luận cho từng nhãn hàng')
     df_binary = df_top[['brandName', 'chất lượng_count', 'giá cả_count', 'thiết kế_count', 'hiệu năng_count', 'đặc điểm kỹ thuật_count', 'dịch vụ_count', 'tình trạng sản phẩm_count']]
     df_binary.columns = ['brandName', 'chất lượng', 'giá cả', 'thiết kế', 'hiệu năng', 'đặc điểm kỹ thuật', 'dịch vụ', 'tình trạng sản phẩm']
     feature_columns = df_binary.columns[1:]
@@ -175,6 +196,14 @@ def hypothesisReviewScreenNhi(strings: StringManager):
 
     st.markdown("""
         **Nhận xét:**
+        - Chất lượng: Apple và Samsung có tỷ lệ nhắc đến chất lượng cao nhất,
+                 cho thấy người tiêu dùng rất chú trọng đến chất lượng khi đánh giá các sản phẩm của hai nhãn hiệu này.
+        - Thiết kế: Oppo có tỷ lệ nhắc đến thiết kế cao hơn so với Apple và Samsung, 
+                cho thấy người tiêu dùng rất quan tâm đến thiết kế của sản phẩm Oppo.
+        - Đặc điểm kỹ thuật: Đặc điểm kỹ thuật được nhắc đến nhiều ở Oppo và Samsung, 
+                cho thấy sự quan tâm lớn đến tính năng kỹ thuật của sản phẩm từ hai nhãn hiệu này.
+        - Dịch vụ: Tỷ lệ nhắc đến dịch vụ khá cao ở Apple và Samsung, cho thấy chất lượng dịch vụ 
+                là một yếu tố quan trọng trong các đánh giá của người tiêu dùng.
         """)
     
     appContext = AppContext.get_instance()
@@ -183,9 +212,22 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     appContext.hyphothesisTitle = "Từ đây ta đưa ra dược các nhận xét như sau"
 
     # hpsContent sẽ là kết quả của phân tích
-    # hpsContent = (f"Kết quả mô hình OLS: \n {model.summary().as_text()} \n "
-    #               f"\n Kết luận: \n{conclusions}")
-    # appContext.hyphothesisContent = hpsContent
+    hpsContent = (f"""Dưới đây là các nhóm từ khóa chính được phân tích, mỗi nhóm phản ánh một khía cạnh quan trọng của sản phẩm hoặc dịch vụ:
+                  
+            - Chất lượng: Các từ khóa này phản ánh cảm nhận của khách hàng về độ bền, độ tin cậy và chất lượng tổng thể của sản phẩm. Chúng cho biết mức độ hài lòng hoặc không hài lòng của khách hàng về chất lượng sản phẩm.
+                  
+            - Giá cả: Nhóm từ khóa này cho thấy sự quan tâm của khách hàng về mặt giá cả và chi phí. Nó giúp doanh nghiệp hiểu được mức độ hài lòng của khách hàng về giá trị mà họ nhận được so với số tiền bỏ ra.
+                  
+            - Thiết kế: Các từ khóa này phản ánh cảm nhận của khách hàng về thiết kế và hình thức của sản phẩm. Chúng giúp xác định mức độ ưa chuộng về mặt thẩm mỹ và kiểu dáng của sản phẩm.
+                  
+            - Hiệu năng: Nhóm từ khóa này liên quan đến hiệu suất và tốc độ hoạt động của sản phẩm. Nó cho thấy mức độ hài lòng của khách hàng về khả năng đáp ứng và vận hành của sản phẩm.
+                  
+            - Đặc điểm kỹ thuật: Các từ khóa này phản ánh những đặc điểm và tính năng kỹ thuật của sản phẩm. Chúng cho biết mức độ hài lòng của khách hàng về các tính năng cụ thể và hiệu quả của chúng.
+                  
+            - Dịch vụ: Nhóm từ khóa này liên quan đến dịch vụ khách hàng và hậu mãi. Nó giúp đánh giá chất lượng dịch vụ, sự hỗ trợ và mức độ hài lòng của khách hàng về dịch vụ mà họ nhận được.
+                  
+            - Tình trạng sản phẩm: Các từ khóa này phản ánh tình trạng thực tế của sản phẩm khi đến tay khách hàng. Nó giúp xác định các vấn đề liên quan đến tình trạng mới, cũ, hoặc hư hỏng của sản phẩm.""")
+    appContext.hyphothesisContent = hpsContent
 
 # Các hàm hỗ trợ
 def count_words(content_column):
