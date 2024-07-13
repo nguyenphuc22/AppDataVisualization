@@ -15,27 +15,6 @@ class ProductManager(AbstractDataManager):
     def __init__(self):
         super().__init__()
 
-    def check_format(self, data):
-        required_columns = ['itemid', 'name', 'priceshow', 'discount', 'ratingscore', 'review',
-                            'location', 'sellername', 'sellerid', 'brandname', 'brandid',
-                            'price', 'category', 'originalprice', 'itemsoldcntshow', 'options']
-
-        # Convert both lists to lowercase for a case-insensitive comparison
-        required_columns_lower = [col.lower() for col in required_columns]
-        data_columns_lower = [col.lower() for col in data.columns]
-
-        # Debugging: Print columns for verification
-        print("Required columns (lowercase):", required_columns_lower)
-        print("Data columns (lowercase):", data_columns_lower)
-
-        # Check if all required columns are present in data.columns, case-insensitively
-        if all(col in data_columns_lower for col in required_columns_lower):
-            print("All required columns are present.")
-            return {'valid': True, 'type': 'product'}
-        else:
-            print("Missing one or more required columns.")
-            return {'valid': False}
-
     def preprocess_data(self, data):
         print("Preprocessing data entry Product")
 
