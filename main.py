@@ -87,7 +87,8 @@ def main():
 
 
     print(f"Final titlePage: {appContext.titlePage}")
-
+    print(f"File is new Data: {appContext.isNewData}")
+    
     if appContext.titlePage == strings.get_string("product_title"):
         print("Executing visualizationProductScreen")
         visualizationProductScreen(strings)
@@ -107,6 +108,8 @@ def main():
     print("===========================================")
     
     chatbotView()
+
+    appContext.isNewData = False
 
 if __name__ == "__main__":
     print("Main Entry...")

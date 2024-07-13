@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+
+from AppContext import AppContext
 from String import StringManager
 from DataManager.ProductManager import ProductManager  # Import ProductManager
 from DataManager.ReviewManager import ReviewManager  # Import ReviewManager
@@ -52,6 +54,8 @@ def uploadFilesView(strings: StringManager):
                         review_manager.update_data(new_data)
                     elif result['type'] == 'product':
                         product_manager.update_data(new_data)
+                    appContext = AppContext.get_instance()
+                    appContext.isNewData = True
                     st.sidebar.text(f"{strings.get_string('update_success')} {uploaded_file.name}")
                 else:
                     st.sidebar.error(f"{strings.get_string('wrong_format')} {uploaded_file.name}")
