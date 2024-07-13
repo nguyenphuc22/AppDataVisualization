@@ -1,5 +1,6 @@
 import streamlit as st
 from AppContext import AppContext
+from ChatBot import OpenAIChatbot
 from DataManager.ProductManager import ProductManager
 from String import StringManager
 from sklearn.preprocessing import LabelEncoder
@@ -57,14 +58,7 @@ def hypothesisProductScreenPhuc(strings: StringManager):
 
     # Kết luận và đề xuất dựa trên kết quả mô hình
     st.header("Kết luận & Khuyến nghị")
-    conclusions = []
-    for var, pval in zip(model.params.index, model.pvalues):
-        if pval < 0.05:
-            conclusions.append(f"- {var} có ảnh hưởng đáng kể đến số lượng bán (p-value < 0.05)")
-        else:
-            conclusions.append(f"- {var} không có ảnh hưởng đáng kể đến số lượng bán (p-value >= 0.05)")
-
-    st.markdown("\n".join(conclusions))
+    openAi = OpenAIChatbot()
 
     # Update AppContext
     appContext = AppContext.get_instance()
@@ -72,8 +66,12 @@ def hypothesisProductScreenPhuc(strings: StringManager):
     appContext.content = "Đây là giả thuyết ols xem các biến brand, location, discount, ratingScore có ảnh hưởng đến số lượng bán hay không."
     appContext.hyphothesisTitle = "Giả thuyết sử dụng OLS trên tập dữ liệu số lượng bản Lazada"
     # hpsContent sẽ là kết quả của mô hình OLS và kết luận từ mô hình
-    hpsContent = (f"Kết quả mô hình OLS: \n {model.summary().as_text()} \n "
-                  f"\n Kết luận: \n{conclusions}")
+    hpsContent = (f"Kết quả mô hình OLS: \n {model.summary().as_text()} \n")
 
     appContext.hyphothesisContent = hpsContent
+    appContext.prompt = "Dựa vào kết quả OLS bên trên, hãy nhận xét OLS cho tôi dạng markdown"
+    response = openAi.generate_response(appContext)
+
+    st.markdown(response)
+
 

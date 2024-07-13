@@ -1,5 +1,7 @@
 from DataManager.DataManager import AbstractDataManager
 import pandas as pd
+from sklearn.preprocessing import RobustScaler
+from sklearn.cluster import DBSCAN
 import re
 
 class ProductManager(AbstractDataManager):
@@ -13,30 +15,7 @@ class ProductManager(AbstractDataManager):
     def __init__(self):
         super().__init__()
 
-    def check_format(self, data):
-        required_columns = ['itemid', 'name', 'priceshow', 'discount', 'ratingscore', 'review',
-                            'location', 'sellername', 'sellerid', 'brandname', 'brandid',
-                            'price', 'category', 'originalprice', 'itemsoldcntshow', 'options']
-
-        # Convert both lists to lowercase for a case-insensitive comparison
-        required_columns_lower = [col.lower() for col in required_columns]
-        data_columns_lower = [col.lower() for col in data.columns]
-
-        # Debugging: Print columns for verification
-        print("Required columns (lowercase):", required_columns_lower)
-        print("Data columns (lowercase):", data_columns_lower)
-
-        # Check if all required columns are present in data.columns, case-insensitively
-        if all(col in data_columns_lower for col in required_columns_lower):
-            print("All required columns are present.")
-            return {'valid': True, 'type': 'product'}
-        else:
-            print("Missing one or more required columns.")
-            return {'valid': False}
-
     def preprocess_data(self, data):
-
-
         print("Preprocessing data entry Product")
 
         try:
@@ -126,10 +105,38 @@ class ProductManager(AbstractDataManager):
         # Reset index
         df_good_products.reset_index(drop=True, inplace=True)
 
+        columns_to_check = ['priceShow', 'discount', 'ratingScore', 'review', 'itemSoldCntShow', 'originalPrice']
+        df_good_products = self.combined_outlier_removal(df_good_products, columns_to_check)
+
         return df_good_products
 
     def get_data(self):
         return self.data
+
+    def combined_outlier_removal(self,df, columns_to_check, eps=0.5, min_samples=5, iqr_factor=1.5):
+        # Bước 1: Áp dụng DBSCAN
+        scaler = RobustScaler()
+        data_scaled = scaler.fit_transform(df[columns_to_check])
+
+        dbscan = DBSCAN(eps=eps, min_samples=min_samples)
+        clusters = dbscan.fit_predict(data_scaled)
+
+        df_dbscan = df[clusters != -1].copy()
+
+        # Bước 2: Áp dụng IQR trên kết quả của DBSCAN
+        def remove_iqr_outliers(df, column, factor=1.5):
+            Q1 = df[column].quantile(0.25)
+            Q3 = df[column].quantile(0.75)
+            IQR = Q3 - Q1
+            lower_bound = Q1 - factor * IQR
+            upper_bound = Q3 + factor * IQR
+            return df[(df[column] >= lower_bound) & (df[column] <= upper_bound)]
+
+        df_combined = df_dbscan.copy()
+        for col in columns_to_check:
+            df_combined = remove_iqr_outliers(df_combined, col, factor=iqr_factor)
+
+        return df_combined
 
     @staticmethod
     def update_brand_name(name, current_brand, brand_patterns):
