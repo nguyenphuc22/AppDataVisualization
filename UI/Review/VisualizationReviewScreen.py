@@ -25,11 +25,7 @@ def visualizationReviewScreen(strings: StringManager):
 
     if chart_type == "Biểu đồ cột":
         bar_chart_option = st.sidebar.radio("Chọn loại biểu đồ cột",
-<<<<<<< Updated upstream
                                             ("Số lượng đánh giá", "Tần suất likeCount theo rating"))
-=======
-                                            ("Số lượng đánh giá ", "LikeCount và rating"))
->>>>>>> Stashed changes
         if bar_chart_option == "Số lượng đánh giá":
             x_column = st.sidebar.selectbox("Chọn trường dữ liệu cho trục x", ['rating'])
             y_column = 'rating'
