@@ -35,6 +35,10 @@ class ProductManager(AbstractDataManager):
             return {'valid': False}
 
     def preprocess_data(self, data):
+
+
+        print("Preprocessing data entry Product")
+
         try:
             df_good_products = data.groupby('itemId').first().reset_index()
         except KeyError:
@@ -44,8 +48,7 @@ class ProductManager(AbstractDataManager):
             df_good_products = df_good_products[~df_good_products['location'].str.contains('overseas', case=False)]
         except KeyError:
             print("Column 'location' is missing. Skipping this step.")
-        
-        # Define brand replacements and patterns
+
         brand_replacements = {
             'xiao': 'Xiaomi',
             'OPPO': 'Oppo',

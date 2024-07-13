@@ -10,6 +10,8 @@ from String import StringManager
 from DataManager.ReviewManager import ReviewManager
 
 def hypothesisReviewScreenNhi(strings: StringManager):
+    print("Hypothesis Review Screen Nhi Entry")
+
     st.title(strings.get_string("hypothesis_title"))
     st.write(strings.get_string("review_hypothesis_title")[0])
 
