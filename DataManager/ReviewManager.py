@@ -134,7 +134,6 @@ class ReviewManager(AbstractDataManager):
 
     # Tiền xử lý dữ liệu
     def preprocessing(self, text):
-        print("Preprocessing data entry ReviewManager")
         text = str(text).lower()
         text = self.replace_dots(text)
         text = self.replace_star_icons(text)
@@ -169,6 +168,8 @@ class ReviewManager(AbstractDataManager):
 
     # Load dữ liệu
     def preprocess_data(self, data):
+        print("Preprocessing data entry ReviewManager")
+
         # Định dạng lại ngày 
         data['boughtDate'] = pd.to_datetime(data['boughtDate'], format='%Y%m%d', errors='coerce')
 
