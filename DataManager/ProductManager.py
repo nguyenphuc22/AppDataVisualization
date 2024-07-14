@@ -102,11 +102,12 @@ class ProductManager(AbstractDataManager):
         except KeyError:
             print("Column 'price' is missing. Skipping this step.")
         
-        # Reset index
-        df_good_products.reset_index(drop=True, inplace=True)
 
         columns_to_check = ['priceShow', 'discount', 'ratingScore', 'review', 'itemSoldCntShow', 'originalPrice']
         df_good_products = self.combined_outlier_removal(df_good_products, columns_to_check)
+        
+        # Reset index
+        df_good_products.reset_index(drop=True, inplace=True)
 
         return df_good_products
 
