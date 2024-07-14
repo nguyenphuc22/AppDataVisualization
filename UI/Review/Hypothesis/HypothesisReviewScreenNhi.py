@@ -10,20 +10,15 @@ from String import StringManager
 from DataManager.ReviewManager import ReviewManager
 from ChatBot import OpenAIChatbot
 
+
 def hypothesisReviewScreenNhi(strings: StringManager):
     print("Hypothesis Review Screen Nhi Entry")
     st.title(strings.get_string("review_hypothesis_title")[0])
-    # st.title(strings.get_string("hypothesis_title"))
-    # st.write(strings.get_string("review_hypothesis_title")[0])
-
-    # Lấy instance của ReviewManager
-    review_manager = ReviewManager.get_instance()
-        
-    # Lấy dữ liệu
-    df_new = review_manager.get_data()
-    
-    # Ghi tiêu đề
     st.markdown("## Trích xuất & phân tích những đặc điểm của sản phẩm thường được nhắc đến trong review")
+
+    # Load data
+    review_manager = ReviewManager.get_instance()
+    df_new = review_manager.get_data()
 
     product_features = {
         'chất lượng': ['chất lượng', 'bền', 'đáng tin cậy', 'kém', 'chất', 'tốt', 'ổn', 'ok', 'oke', 'ổn định', 'good', 'nét', 'sắc nét', 'ngon', 'ngon lành', 'tạm', 'chắc chắn'],
@@ -40,165 +35,161 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     word_counts_df = word_counts_df.sort_values(by='Count', ascending=False)
     word_counts_df = word_counts_df[word_counts_df['Count'] > 1]
 
-    filtered_words_df = filter_words_by_features(word_counts_df, product_features)
+    filtered_words_dict = filter_words_by_features(word_counts_df, product_features)
 
-    features = defaultdict(dict)
-    for index, row in filtered_words_df.iterrows():
-        feature = row['Feature']
-        word = row['Word']
-        count = row['Count']
-        if word in features[feature]:
-            features[feature][word] += count
-        else:
-            features[feature][word] = count
-
-    word_counts = defaultdict(int)
-    for index, row in filtered_words_df.iterrows():
-        word = row['Word']
-        count = row['Count']
-        word_counts[word] += count
+    # Flatten the dictionary for the overall word counts
+    overall_word_counts = sum((Counter(words) for words in filtered_words_dict.values()), Counter())
 
     # Visualization 1: Word Clouds cho từng đặc điểm và tổng hợp
     st.subheader('1. Mô hình đám mây từ cho các từ khóa đánh giá sản phẩm')
-    wordcloud_all = WordCloud(width=800, height=600, background_color='white', colormap='plasma').generate_from_frequencies(word_counts)
+    wordcloud_all = WordCloud(width=800, height=600, background_color='white', colormap='plasma').generate_from_frequencies(overall_word_counts)
+    
     fig, axs = plt.subplots(2, 4, figsize=(20, 10))
     fig.suptitle('Word Clouds cho từng đặc điểm và tổng hợp')
 
-    for i, (feature, words) in enumerate(features.items()):
-        wordcloud = WordCloud(width=400, height=300, background_color='white', colormap='viridis').generate_from_frequencies(dict(words))
-        axs[i//4, i%4].imshow(wordcloud, interpolation='bilinear')
-        axs[i//4, i%4].set_title(feature)
-        axs[i//4, i%4].axis('off')
+    for i, (feature, words) in enumerate(filtered_words_dict.items()):
+        wordcloud = WordCloud(width=400, height=300, background_color='white', colormap='viridis').generate_from_frequencies(words)
+        axs[i // 4, i % 4].imshow(wordcloud, interpolation='bilinear')
+        axs[i // 4, i % 4].set_title(feature)
+        axs[i // 4, i % 4].axis('off')
 
     axs[1, 3].imshow(wordcloud_all, interpolation='bilinear')
     axs[1, 3].set_title('Tổng hợp')
     axs[1, 3].axis('off')
 
     st.pyplot(fig)
-    # st.markdown("""
-    #     **Nhận xét:**
-    #     """)
     
     # Visualization 2: Biểu đồ cột tổng Count cho mỗi Feature
     st.subheader('2. Biểu đồ cột biểu diễn tổng số lần xuất hiện của các nhóm từ khóa đánh giá sản phẩm')
-    feature_totals = filtered_words_df.groupby('Feature')['Count'].sum().reset_index()
+    # Convert `filtered_words_dict` to a DataFrame for plotting
+    data = {
+        'Feature': [],
+        'Count': []
+    }
+    for feature, words in filtered_words_dict.items():
+        total_count = sum(words.values())
+        data['Feature'].append(feature)
+        data['Count'].append(total_count)
+
+    feature_totals = pd.DataFrame(data)
+
+    # Plotting
     fig, ax = plt.subplots(figsize=(10, 6))
     bars = ax.bar(feature_totals['Feature'], feature_totals['Count'], color='skyblue')
 
+    # Add text labels on the bars
     for bar in bars:
         height = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width()/2., height,
-                f'{int(height)}',
-                ha='center', va='bottom')
+        ax.text(bar.get_x() + bar.get_width() / 2., height, f'{int(height)}', ha='center', va='bottom')
 
+    # Customize plot
     plt.title('Tổng Count cho mỗi Feature')
     plt.xlabel('Feature')
     plt.ylabel('Tổng Count')
     plt.xticks(rotation=30)
     plt.tight_layout()
+
+    # Display plot
     st.pyplot(fig)
 
-    # Nhận xét động trực quan 2
+    # Analyzing the top features
     top_features = feature_totals.sort_values(by='Count', ascending=False).reset_index(drop=True)
     top_feature_names = top_features['Feature'].tolist()
     top_counts = top_features['Count'].tolist()
 
-    # Xác định các nhóm từ khóa chính
-    most_mentioned_feature = top_feature_names[0]
-    second_most_feature = top_feature_names[1] if len(top_feature_names) > 1 else "không đủ dữ liệu"
-    third_most_feature = top_feature_names[2] if len(top_feature_names) > 2 else "không đủ dữ liệu"
-    fourth_most_feature = top_feature_names[3] if len(top_feature_names) > 3 else "không đủ dữ liệu"
+    # Extract top 4 features and their counts
+    top_details = [(top_feature_names[i] if i < len(top_feature_names) else "không đủ dữ liệu",
+                    top_counts[i] if i < len(top_counts) else 0) 
+                for i in range(4)]
 
-    most_mentioned_count = top_counts[0]
-    second_most_count = top_counts[1] if len(top_counts) > 1 else 0
-    third_most_count = top_counts[2] if len(top_counts) > 2 else 0
-    fourth_most_count = top_counts[3] if len(top_counts) > 3 else 0
-
-    # Nhận xét động
+    # Format the comment
     content2 = f"""Thông qua Biểu đồ cột biểu diễn tổng số lần xuất hiện của các nhóm từ khóa đánh giá sản phẩm, rút ra được một số kết luận về sự quan tâm của các khách hàng như sau:
-    
-    - Nhóm từ khóa '{most_mentioned_feature}' có tổng số lần xuất hiện cao nhất, với {int(most_mentioned_count)} lượt, cho thấy đây là yếu tố quan trọng nhất đối với khách hàng khi mua sắm sản phẩm điện tử.
 
-    - Tiếp theo là nhóm từ khóa '{second_most_feature}' với {int(second_most_count)} lượt, cho thấy sự quan tâm lớn của khách hàng đến yếu tố này.
+    - Nhóm từ khóa '{top_details[0][0]}' có tổng số lần xuất hiện cao nhất, với {int(top_details[0][1])} lượt, cho thấy đây là yếu tố quan trọng nhất đối với khách hàng khi mua sắm sản phẩm điện tử.
 
-    - Nhóm từ khóa '{third_most_feature}' và '{fourth_most_feature}' lần lượt đứng thứ ba và thứ tư, với {int(third_most_count)} và {int(fourth_most_count)} lượt xuất hiện, cho thấy các yếu tố này cũng được khách hàng quan tâm nhưng không nhiều bằng hai yếu tố chính.
+    - Tiếp theo là nhóm từ khóa '{top_details[1][0]}' với {int(top_details[1][1])} lượt, cho thấy sự quan tâm lớn của khách hàng đến yếu tố này.
+
+    - Nhóm từ khóa '{top_details[2][0]}' và '{top_details[3][0]}' lần lượt đứng thứ ba và thứ tư, với {int(top_details[2][1])} và {int(top_details[3][1])} lượt xuất hiện, cho thấy các yếu tố này cũng được khách hàng quan tâm nhưng không nhiều bằng hai yếu tố chính.
     """
 
-    # st.markdown(f"""**Nhận xét:** 
-                
-    #             {content2}
-    #             """)
+    # Display the content
+    st.write(content2)
     
     # Visualization 3: Biểu đồ cột Keywords Count by Brand and Feature
     st.subheader('3. Biểu đồ cột biểu diễn tổng số lượng mỗi nhóm từ khóa cho từng nhãn hàng')
+    # for feature, keywords in product_features.items():
+    #     df_new[feature + '_count'] = df_new['cleanedContent'].apply(lambda x: count_keywords(keywords, x))
     for feature, keywords in product_features.items():
-        df_new[feature + '_count'] = df_new['cleanedContent'].apply(lambda x: count_keywords(keywords, x))
+        df_new[feature + '_count'] = count_keywords_optimized(keywords, df_new['cleanedContent'])
 
-    plot_data = pd.DataFrame()
-
-    for feature, keywords in product_features.items():
+    plot_data_list = []
+    for feature in product_features.keys():
         temp_df = df_new.groupby('brandName')[feature + '_count'].sum().reset_index()
         temp_df['Feature'] = feature.capitalize()
         temp_df.rename(columns={feature + '_count': 'Keywords Count'}, inplace=True)
-        plot_data = pd.concat([plot_data, temp_df])
+        plot_data_list.append(temp_df)
 
-    plot_data.reset_index(drop=True, inplace=True)
+    plot_data = pd.concat(plot_data_list, ignore_index=True)
+
+    # Find the maximum value for the y-axis
+    max_y = plot_data['Keywords Count'].max()
+
+    # Plotting
     fig, ax = plt.subplots(figsize=(24, 12))
     sns.barplot(x='brandName', y='Keywords Count', hue='Feature', data=plot_data, alpha=0.8, ax=ax)
     plt.title('Keywords Count by Brand and Feature')
     plt.xlabel('Brand Name')
     plt.ylabel('Keywords Count')
-    plt.ylim(0, 2000)
+    plt.ylim(0, max_y + max_y * 0.1)  # Adding 10% margin to the max value
     plt.grid(axis='y')
     st.pyplot(fig)
 
     # Nhận xét động trực quan 3
     # Tính toán các thông số cần thiết
-    top_brands = plot_data.groupby('brandName')['Keywords Count'].sum().sort_values(ascending=False).reset_index()
+    # Analyzing top brands and features more efficiently
+    top_brands = plot_data.groupby('brandName', as_index=False)['Keywords Count'].sum().nlargest(3, 'Keywords Count')
+    top_features = plot_data.groupby('Feature', as_index=False)['Keywords Count'].sum().nlargest(3, 'Keywords Count')
+
+    # Extract top brands and counts
     top_brands_names = top_brands['brandName'].tolist()
     top_brands_counts = top_brands['Keywords Count'].tolist()
 
-    # Xác định các thương hiệu hàng đầu
-    top_brand1 = top_brands_names[0]
-    top_brand2 = top_brands_names[1] if len(top_brands_names) > 1 else "không đủ dữ liệu"
-    top_brand3 = top_brands_names[2] if len(top_brands_names) > 2 else "không đủ dữ liệu"
-    top_brand4 = top_brands_names[3] if len(top_brands_names) > 3 else "không đủ dữ liệu"
+    top_brand1, top_brand2, top_brand3 = (top_brands_names + ["không đủ dữ liệu"] * 3)[:3]
+    top_brand1_count, top_brand2_count, top_brand3_count = (top_brands_counts + [0] * 3)[:3]
 
-    top_brand1_count = top_brands_counts[0]
-    top_brand2_count = top_brands_counts[1] if len(top_brands_counts) > 1 else 0
-    top_brand3_count = top_brands_counts[2] if len(top_brands_counts) > 2 else 0
-
-    # Xác định các nhóm từ khóa chính cho các thương hiệu hàng đầu
-    top_features = plot_data.groupby('Feature')['Keywords Count'].sum().sort_values(ascending=False).reset_index()
+    # Extract top features and counts
     top_feature_names = top_features['Feature'].tolist()
     top_feature_counts = top_features['Keywords Count'].tolist()
 
-    # Nhận xét động
+    top_feature1, top_feature2, top_feature3 = (top_feature_names + ["không đủ dữ liệu"] * 3)[:3]
+    top_feature1_count, top_feature2_count, top_feature3_count = (top_feature_counts + [0] * 3)[:3]
+
+    # Format comments
     content3 = f"""Thông qua biểu đồ Biểu đồ cột biểu diễn tổng số lượng mỗi nhóm từ khóa cho từng nhãn hàng, rút ra được một số kết luận về sự quan tâm của khách hàng như sau:
 
     - Thương hiệu '{top_brand1}' dẫn đầu với tổng số {int(top_brand1_count)} lượt xuất hiện các từ khóa, cho thấy đây là nhãn hàng nhận được nhiều sự quan tâm nhất.
 
     - Tiếp theo là các thương hiệu '{top_brand2}' và '{top_brand3}' với tổng số lượt xuất hiện lần lượt là {int(top_brand2_count)} và {int(top_brand3_count)} lượt, cho thấy sự quan tâm lớn đến các nhãn hàng này.
 
-    - Các nhóm từ khóa chính mà khách hàng quan tâm bao gồm '{top_feature_names[0]}' với tổng số {int(top_feature_counts[0])} lượt, '{top_feature_names[1]}' và '{top_feature_names[2]}' cũng thu hút sự chú ý lớn, cho thấy sự quan tâm chủ yếu đến các yếu tố này.
+    - Các nhóm từ khóa chính mà khách hàng quan tâm bao gồm '{top_feature1}' với tổng số {int(top_feature1_count)} lượt, '{top_feature2}' và '{top_feature3}' cũng thu hút sự chú ý lớn, cho thấy sự quan tâm chủ yếu đến các yếu tố này.
     """
-    # st.markdown(f"""**Nhận xét:** 
-                
-    #             {content3}
-    #             """)
     
     # Visualization 4: Biểu đồ tròn tỷ lệ đặc tính cho các brand hàng đầu
     st.subheader('4. Biểu đồ tròn biểu diễn tỷ lệ giữa các nhóm từ khóa cho từng nhãn hàng')
-    top_brands = df_new['brandName'].value_counts().nlargest(3).index.tolist()
+    top_brands = df_new['brandName'].value_counts().nlargest(3).index
     df_top = df_new[df_new['brandName'].isin(top_brands)]
-
-    feature_columns = ['chất lượng_count', 'giá cả_count', 'thiết kế_count', 'hiệu năng_count', 'đặc điểm kỹ thuật_count', 'dịch vụ_count', 'tình trạng sản phẩm_count']
+    feature_columns = [
+        'chất lượng_count', 'giá cả_count', 'thiết kế_count',
+        'hiệu năng_count', 'đặc điểm kỹ thuật_count',
+        'dịch vụ_count', 'tình trạng sản phẩm_count'
+    ]
     df_feature_counts = df_top.groupby('brandName')[feature_columns].sum()
-    df_feature_counts.columns = ['chất lượng', 'giá cả', 'thiết kế', 'hiệu năng', 'đặc điểm kỹ thuật', 'dịch vụ', 'tình trạng sản phẩm']
-
+    df_feature_counts.columns = [
+        'chất lượng', 'giá cả', 'thiết kế', 'hiệu năng',
+        'đặc điểm kỹ thuật', 'dịch vụ', 'tình trạng sản phẩm'
+    ]
     df_feature_counts['tổng giá trị'] = df_feature_counts.sum(axis=1)
-    df_feature_counts = df_feature_counts.sort_values(by='tổng giá trị', ascending=False)
-    df_feature_counts = df_feature_counts.drop(columns=['tổng giá trị'])
+    df_feature_counts = df_feature_counts.sort_values(by='tổng giá trị', ascending=False).drop(columns=['tổng giá trị'])
    
 
     fig, axs = plt.subplots(1, 3, figsize=(20, 6))  # Tạo một hàng với 3 biểu đồ
@@ -216,41 +207,48 @@ def hypothesisReviewScreenNhi(strings: StringManager):
 
     # Nhận xét động trực quan 4
     # Tính toán các tỷ lệ phần trăm và sự chênh lệch
+    # Find top brand and top feature for that brand
     top_brand = df_feature_counts.index[0]
     top_feature = df_feature_counts.loc[top_brand].idxmax()
     top_feature_percentage = df_feature_counts.loc[top_brand].max() / df_feature_counts.loc[top_brand].sum() * 100
 
-    brand_1 = df_feature_counts.index[0]
-    brand_2 = df_feature_counts.index[1]
-    brand_3 = df_feature_counts.index[2]
+    # Select top 3 brands
+    top_brands = df_feature_counts.index[:3]
 
-    # Tìm kiếm các đặc điểm được nhắc đến nhiều nhất
-    brand_1_top_feature = df_feature_counts.loc[brand_1].idxmax()
-    brand_1_second_top_feature = df_feature_counts.loc[brand_1].nlargest(2).index[1]
-    brand_1_diff = df_feature_counts.loc[brand_1, brand_1_top_feature] - df_feature_counts.loc[brand_1, brand_1_second_top_feature]
-    brand_1_diff_percentage = brand_1_diff / df_feature_counts.loc[brand_1].sum() * 100
+    # Initialize dictionary to store results
+    brand_features = {}
 
-    brand_2_top_feature = df_feature_counts.loc[brand_2].idxmax()
-    brand_2_second_top_feature = df_feature_counts.loc[brand_2].nlargest(2).index[1]
-    brand_2_diff_percentage = abs(df_feature_counts.loc[brand_2, brand_2_top_feature] - df_feature_counts.loc[brand_2, brand_2_second_top_feature]) / df_feature_counts.loc[brand_2].sum() * 100
+    # Calculate top features and their percentages for each top brand
+    for brand in top_brands:
+        top_feature = df_feature_counts.loc[brand].idxmax()
+        second_top_feature = df_feature_counts.loc[brand].nlargest(2).index[1]
+        diff = df_feature_counts.loc[brand, top_feature] - df_feature_counts.loc[brand, second_top_feature]
+        diff_percentage = diff / df_feature_counts.loc[brand].sum() * 100
+        brand_features[brand] = {
+            'top_feature': top_feature,
+            'second_top_feature': second_top_feature,
+            'diff_percentage': diff_percentage
+        }
 
-    brand_3_top_feature = df_feature_counts.loc[brand_3].idxmax()
-    brand_3_second_top_feature = df_feature_counts.loc[brand_3].nlargest(2).index[1]
-    brand_3_diff_percentage = abs(df_feature_counts.loc[brand_3, brand_3_top_feature] - df_feature_counts.loc[brand_3, brand_3_second_top_feature]) / df_feature_counts.loc[brand_3].sum() * 100
+    # Extract brand data for the top 3 brands
+    brand_1 = top_brands[0]
+    brand_2 = top_brands[1]
+    brand_3 = top_brands[2]
+
+    brand_1_data = brand_features[brand_1]
+    brand_2_data = brand_features[brand_2]
+    brand_3_data = brand_features[brand_3]
 
     content4 = f""" Thông qua Biểu đồ tròn biểu diễn tỷ lệ giữa các nhóm từ khóa cho từng nhãn hàng, rút ra được một số kết luận về sự quan tâm của khách hàng như sau:
 
     - '{top_feature}' luôn là đặc điểm được quan tâm nhiều nhất với tỷ lệ vượt trội trên {top_feature_percentage:.1f}% so với toàn bộ các từ khóa.
+
+    - Các khách hàng của nhãn hàng {brand_1} nhắc nhiều về các từ khóa '{brand_1_data['top_feature']}' hơn '{brand_1_data['second_top_feature']}', với sự chênh lệch xấp xỉ {brand_1_data['diff_percentage']:.1f}%.
         
-    - Các khách hàng của nhãn hàng {brand_1} nhắc nhiều về các từ khóa '{brand_1_top_feature}' hơn '{brand_1_second_top_feature}', với sự chênh lệch xấp xỉ {brand_1_diff_percentage:.1f}%.
+    - Các khách hàng của {brand_2} nhắc đến nhiều về các đặc điểm '{brand_2_data['top_feature']}' hơn, mà trong đó sự chênh lệch giữa hai đặc điểm này ở {brand_2} là {brand_2_data['diff_percentage']:.1f}%.
         
-    - Các khách hàng của {brand_2} nhắc đến nhiều về các đặc điểm '{brand_2_top_feature}' hơn, mà trong đó sự chênh lệch giữa hai đặc điểm này ở {brand_2} là {brand_2_diff_percentage:.1f}%.
-    
-    - Tiếp theo khách hàng của {brand_3} nhắc đến nhiều về các đặc điểm '{brand_3_top_feature}' hơn, mà trong đó sự chênh lệch giữa hai đặc điểm này ở {brand_3} là {brand_3_diff_percentage:.1f}%.
+    - Tiếp theo khách hàng của {brand_3} nhắc đến nhiều về các đặc điểm '{brand_3_data['top_feature']}' hơn, mà trong đó sự chênh lệch giữa hai đặc điểm này ở {brand_3} là {brand_3_data['diff_percentage']:.1f}%.
     """
-    # st.markdown(f""" **Nhận xét:**
-                
-    #             {content4}""")
 
 
     # Visualization 5: Biểu đồ cột tỷ lệ nhắc đến các đặc tính trong mỗi bình luận của các brand name
@@ -270,7 +268,7 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     fig, ax = plt.subplots(figsize=(14, 8))
     sns.barplot(x='brandName', y='Ratio', hue='Feature', data=plot_data, alpha=0.8)
     plt.title('Tỷ lệ nhắc đến các đặc tính trong mỗi bình luận của các brand name')
-    plt.xlabel('Brand Name')
+    plt.xlabel('Hãng sản phảm')
     plt.ylabel('Tỷ lệ nhắc đến')
     plt.legend(title='Đặc tính')
     plt.grid(axis='y')
@@ -333,23 +331,20 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     st.markdown(response)
 
 # Các hàm hỗ trợ
+@st.cache_data
 def count_words(content_column):
-    word_counts = Counter()
-    for content in content_column:
-        word_counts.update(content)
-    return word_counts
+    return Counter(word for content in content_column for word in content)
 
 @st.cache_data
 def filter_words_by_features(word_counts_df, features_dict):
-    result = pd.DataFrame(columns=['Feature', 'Word', 'Count'])
+    """Filter words by features and their keywords."""
+    filtered_words_dict = {}
     for feature, keywords in features_dict.items():
-        filtered_words = word_counts_df[word_counts_df['Word'].isin(keywords)]
-        filtered_words['Feature'] = feature
-        result = pd.concat([result, filtered_words], ignore_index=True)
-    return result
+        filtered_df = word_counts_df[word_counts_df['Word'].isin(keywords)]
+        filtered_words_dict[feature] = dict(zip(filtered_df['Word'], filtered_df['Count']))
+    return filtered_words_dict
 
 @st.cache_data
-def count_keywords(keywords, text):
-    count = sum(1 for word in text if word in keywords)
-    return count
-
+def count_keywords_optimized(keywords, df_col):
+    keywords_set = set(keywords)
+    return df_col.apply(lambda x: sum(word in keywords_set for word in x))
