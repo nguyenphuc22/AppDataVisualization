@@ -95,8 +95,8 @@ def main():
         hypothesisProductScreenPhuc(strings)
     elif appContext.titlePage == strings.get_string("product_hypothesis_title")[1]:
         hypothesisProductScreenThanh(strings)
-    elif appContext.titlePage == strings.get_string("product_hypothesis_title")[2]:
-        hypothesisProductScreenBinh(strings)
+    # elif appContext.titlePage == strings.get_string("product_hypothesis_title")[2]:
+    #     hypothesisProductScreenBinh(strings)
     elif appContext.titlePage == strings.get_string("review_title"):
         print("Executing visualizationReviewScreen")
         visualizationReviewScreen(strings)
