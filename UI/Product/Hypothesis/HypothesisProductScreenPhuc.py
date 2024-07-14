@@ -7,6 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 import matplotlib.pyplot as plt
 from statsmodels.formula.api import ols
 import seaborn as sns
+import json
 
 
 def hypothesisProductScreenPhuc(strings: StringManager):
@@ -15,7 +16,6 @@ def hypothesisProductScreenPhuc(strings: StringManager):
     st.title(strings.get_string("product_hypothesis_title")[0])
 
     productManager = ProductManager.get_instance()
-
     df_cleaned = productManager.data
 
     # Mã hóa biến phân loại
@@ -45,7 +45,7 @@ def hypothesisProductScreenPhuc(strings: StringManager):
     n_vars = len(selected_vars)
     n_rows = (n_vars + 1) // 2
     n_cols = 2
-    fig, axes = plt.subplots(n_rows, n_cols, figsize=(12, 6*n_rows))
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(12, 6 * n_rows))
 
     for i, var in enumerate(selected_vars):
         row = i // 2
@@ -62,16 +62,23 @@ def hypothesisProductScreenPhuc(strings: StringManager):
 
     # Update AppContext
     appContext = AppContext.get_instance()
+
+    # Tạo một dictionary để lưu trữ thông tin về giả thuyết
+    hypothesis_info = {
+        "title": "Giả thuyết sử dụng OLS trên tập dữ liệu số lượng bán Lazada",
+        "description": "Đây là giả thuyết OLS xem các biến nào có ảnh hưởng đến số lượng bán hay không.",
+        "selectedVariables": selected_vars,
+        "modelSummary": model.summary().as_text(),
+        "visualizationType": "Biểu đồ phân tán"
+    }
+
+    # Cập nhật AppContext
     appContext.titlePage = strings.get_string("product_hypothesis_title")[0]
-    appContext.content = "Giả thuyết sử dụng OLS trên tập dữ liệu số lượng bản Lazada"
-    appContext.hyphothesisTitle = "Giả thuyết sử dụng OLS trên tập dữ liệu số lượng bản Lazada, Đây là giả thuyết ols xem các biến nào có ảnh hưởng đến số lượng bán hay không."
-    # hpsContent sẽ là kết quả của mô hình OLS và kết luận từ mô hình
-    hpsContent = (f"Kết quả mô hình OLS: \n {model.summary().as_text()} \n")
- 
-    appContext.hyphothesisContent = hpsContent
-    appContext.prompt = "Dựa vào kết quả OLS bên trên, hãy nhận xét OLS cho tôi về giả thuyết biến có ảnh hưởng đến số lượng bán hay không ? trả về dạng markdown"
+    appContext.content = "Giả thuyết sử dụng OLS trên tập dữ liệu số lượng bán Lazada"
+    appContext.hyphothesisTitle = hypothesis_info["title"] + "\n" + hypothesis_info["description"]
+    appContext.hyphothesisContent = ', '.join(hypothesis_info["selectedVariables"]) + "\n```" + hypothesis_info["modelSummary"] + "```\nBiểu đồ phân tán"
+    appContext.prompt = "Dựa vào kết quả OLS bên trên, hãy nhận xét OLS cho tôi về giả thuyết biến có ảnh hưởng đến số lượng bán hay không? Trả về dạng markdown."
+
     response = openAi.generate_response(appContext)
 
     st.markdown(response)
-
-

@@ -1,7 +1,10 @@
+import numpy as np
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+
+from AppContext import AppContext
 from DataManager.ProductManager import ProductManager
 from String import StringManager
 
@@ -11,8 +14,29 @@ def visualizationProductScreen(strings: StringManager):
     st.title(strings.get_string("data_visualization_title"))
     st.write(strings.get_string("data_visualization_message"))
 
+    # Update AppContext
+    app_context = AppContext.get_instance()
+    app_context.titlePage = "Trực quan hóa dữ liệu sản phẩm"
+    app_context.content = "Khám phá và phân tích dữ liệu sản phẩm thông qua các biểu đồ trực quan."
+
     productManager = ProductManager.get_instance()
     data = productManager.get_data()
+
+    # Tạo data summary
+    data_summary = data.describe()
+    numeric_columns = data.select_dtypes(include=[np.number]).columns
+    categorical_columns = data.select_dtypes(include=['object']).columns
+
+    summary_text = "Tóm tắt dữ liệu:\n"
+    summary_text += f"- Số lượng mẫu: {len(data)}\n"
+    summary_text += f"- Số cột số: {len(numeric_columns)}\n"
+    summary_text += f"- Số cột phân loại: {len(categorical_columns)}\n"
+
+    for col in numeric_columns:
+        summary_text += f"- {col}: Trung bình = {data_summary[col]['mean']:.2f}, Min = {data_summary[col]['min']:.2f}, Max = {data_summary[col]['max']:.2f}\n"
+
+    app_context.hyphothesisTitle = "Phân tích xu hướng bán hàng và tóm tắt dữ liệu"
+    app_context.hyphothesisContent = summary_text
 
     # Hiển thị bảng dữ liệu
     st.subheader("Bảng dữ liệu sản phẩm")
@@ -55,3 +79,20 @@ def visualizationProductScreen(strings: StringManager):
 
     plt.tight_layout()
     st.pyplot(fig)
+
+    # Update AppContext based on the selected chart
+    chart_summary = f"\nPhân tích {chart_type.lower()}:\n"
+    chart_summary += f"Biểu đồ này cho thấy mối quan hệ giữa {x_column} và {y_column}, "
+    chart_summary += f"giúp chúng ta hiểu rõ hơn về xu hướng trong dữ liệu sản phẩm.\n"
+
+    if chart_type == "Biểu đồ cột":
+        top_category = data[x_column].value_counts().index[0]
+        chart_summary += f"Danh mục '{top_category}' có số lượng cao nhất trong {x_column}.\n"
+    elif chart_type == "Biểu đồ phân tán":
+        correlation = data[[x_column, y_column]].corr().iloc[0, 1]
+        chart_summary += f"Hệ số tương quan giữa {x_column} và {y_column} là {correlation:.2f}.\n"
+    else:  # "Biểu đồ violin"
+        median_value = data.groupby(x_column)[y_column].median().sort_values(ascending=False).index[0]
+        chart_summary += f"Danh mục '{median_value}' có giá trị trung vị cao nhất cho {y_column}.\n"
+
+    app_context.hyphothesisContent += chart_summary

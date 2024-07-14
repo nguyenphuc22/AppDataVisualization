@@ -21,23 +21,23 @@ def chatbotView():
 
     message_container = st.sidebar.container()
 
-    with st.sidebar.form(key='my_form'):
+    # Use a callback function to handle new messages
+    def handle_new_message():
+        user_input = st.session_state.user_input
+        if user_input:  # Check if there's any input
+            appContext.prompt = user_input
+            response = ChatBot.OpenAIChatbot().generate_response(app_context=appContext)
+            # Append both user and bot messages
+            st.session_state['messages'].append({"You": user_input, "Bot": response})
+            # Clear the input field by resetting the session state variable
+            st.session_state.user_input = ""
 
-        user_input = st.text_input(f"{strings.get_string('you')}:", key='user_input')
-        submit_button = st.form_submit_button(label=f"{strings.get_string('send')}")
+    # Text input with on_change callback to handle new messages
+    user_input = st.sidebar.text_input(f"{strings.get_string('you')}:", key='user_input', on_change=handle_new_message)
 
-    if submit_button and user_input:
-        appContext.prompt = user_input
-        st.session_state['messages'].append({"You": user_input})
-
-        response = ChatBot.OpenAIChatbot().generate_response(app_context=appContext)
-        st.session_state['messages'].append({"Bot": response})
-
-        # Clear the input field -> Nó còn bug, nào rãnh hả fix
-        # st.session_state['user_input'] = ""
-
+    # Display messages
     for message in st.session_state['messages']:
         if 'You' in message:
             message_container.write(f"{strings.get_string('you')}: {message['You']}")
-        else:
+        if 'Bot' in message:
             message_container.write(f"{strings.get_string('bot')}: {message['Bot']}")
