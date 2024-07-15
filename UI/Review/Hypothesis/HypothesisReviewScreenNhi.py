@@ -6,9 +6,11 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 from AppContext import AppContext
+from FixedContent import FixedContent
 from String import StringManager
 from DataManager.ReviewManager import ReviewManager
 from ChatBot import OpenAIChatbot
+
 
 def hypothesisReviewScreenNhi(strings: StringManager):
     print("Hypothesis Review Screen Nhi Entry")
@@ -61,7 +63,7 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     # Visualization 1: Word Clouds cho từng đặc điểm và tổng hợp
     st.subheader('1. Mô hình đám mây từ cho các từ khóa đánh giá sản phẩm')
     wordcloud_all = WordCloud(width=800, height=600, background_color='white', colormap='plasma').generate_from_frequencies(word_counts)
-    fig, axs = plt.subplots(2, 4, figsize=(20, 10))
+    fig, axs = plt.subplots(2, 4, figsize=(16, 8))
     fig.suptitle('Word Clouds cho từng đặc điểm và tổng hợp')
 
     for i, (feature, words) in enumerate(features.items()):
@@ -74,6 +76,7 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     axs[1, 3].set_title('Tổng hợp')
     axs[1, 3].axis('off')
 
+    plt.savefig('ChatBotUtils/image/reviews_keywords_wordclouds.png')
     st.pyplot(fig)
     # st.markdown("""
     #     **Nhận xét:**
@@ -82,7 +85,7 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     # Visualization 2: Biểu đồ cột tổng Count cho mỗi Feature
     st.subheader('2. Biểu đồ cột biểu diễn tổng số lần xuất hiện của các nhóm từ khóa đánh giá sản phẩm')
     feature_totals = filtered_words_df.groupby('Feature')['Count'].sum().reset_index()
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(10, 7))
     bars = ax.bar(feature_totals['Feature'], feature_totals['Count'], color='skyblue')
 
     for bar in bars:
@@ -96,6 +99,7 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     plt.ylabel('Tổng Count')
     plt.xticks(rotation=30)
     plt.tight_layout()
+    plt.savefig('ChatBotUtils/image/reviews_keywords_columnschart.png')
     st.pyplot(fig)
 
     # Nhận xét động trực quan 2
@@ -154,6 +158,7 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     plt.ylabel('Keywords Count')
     plt.ylim(0, max_y + max_y * 0.1)  # Adding 10% margin to the max value
     plt.grid(axis='y')
+    plt.savefig('ChatBotUtils/image/reviews_keywordsVsBrand_columnschart.png')
     st.pyplot(fig)
 
     # Nhận xét động trực quan 3
@@ -216,6 +221,7 @@ def hypothesisReviewScreenNhi(strings: StringManager):
         axs[i].set_title(f'Biểu đồ tỷ lệ của {brand}')
         plt.tight_layout()
 
+    plt.savefig('ChatBotUtils/image/reviews_keywordsVsBrand_pieschart.png')
     st.pyplot(fig)
 
     # Nhận xét động trực quan 4
@@ -279,6 +285,7 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     plt.ylabel('Tỷ lệ nhắc đến')
     plt.legend(title='Đặc tính')
     plt.grid(axis='y')
+    plt.savefig('ChatBotUtils/image/reviews_keywordsVsBrand_probabilitychart.png')
     st.pyplot(fig)
 
     # Nhận xét động hình ảnh trực quan 5
@@ -333,9 +340,13 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     """)
     appContext.hyphothesisContent = hpsContent
     appContext.prompt = "Dựa vào giả thuyết đặc điểm của sản phẩm thường được nhắc đến trong review trên hãy nhận xét cho tôi dạng markdown"
+    
+    fixedContent = FixedContent.get_instance()
+    fixedContent.reviews_keywords_generalContent = hpsContent
+    
     response = openAi.generate_response(appContext) 
-
-    st.markdown(response)
+    st.markdown(f"<div style='color: cyan; text-align: right;'>{strings.get_string('you')}: {appContext.prompt}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align: left;'>{strings.get_string('bot')}:\n\n {response}</div>", unsafe_allow_html=True)
 
 # Các hàm hỗ trợ
 def count_words(content_column):

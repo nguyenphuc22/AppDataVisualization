@@ -4,6 +4,7 @@ import streamlit as st
 from AppContext import AppContext
 from DataManager.ProductManager import ProductManager
 from DataManager.ReviewManager import ReviewManager
+from FixedContent import FixedContent
 from String import StringManager
 from UI.Component.ChatBotView import chatbotView
 from UI.Component.UploadFilesView import uploadFilesView
@@ -15,15 +16,18 @@ from UI.Product.VisualizationProductScreen import visualizationProductScreen
 from UI.Review.Hypothesis.HypothesisReviewScreenNhi import hypothesisReviewScreenNhi
 from UI.Review.Hypothesis.HypothesisReviewScreenVien import hypothesisReviewScreenVien
 from UI.Review.VisualizationReviewScreen import visualizationReviewScreen
+from ChatBot import build_database
 
 # Create an instance of StringManager
 strings = StringManager.get_instance()
 productManager = ProductManager.get_instance()
 reviewManager = ReviewManager.get_instance()
 appContext = AppContext.get_instance()
+fixedContent = FixedContent.get_instance()
 
 def main():
     uploadFilesView(strings)
+    build_database()
 
     menu = st.sidebar.selectbox(
         strings.get_string("menu_title"),

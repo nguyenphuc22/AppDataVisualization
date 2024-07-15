@@ -5,9 +5,11 @@
 ## Chạy sử dụng CLI
 - streamlit run main.py
 
+## Về Chatbot Keys
+- Để có thể sử dụng chức năng liên quan đến chatbot, xin hãy cập nhật `OPENAI_API_KEY` tại file `ChatBotUtils/privateInfo.py`
+
 ## Ghi Chú
 - Đã cập nhật thêm phần giả thuyết cho từng người. Mọi người xem và bổ sung thêm vào nhé. Phần nào có từ "TODO + Tên ai thì người đó làm nhé" là phần cần bổ sung.
-- Phần ChatBot em sẽ nghiên cứu và cập nhật lên sau
 
 ## Kế hoạch
 Kế hoạch thực hiện ứng dụng "Data Visualization" cho dự án cuối kỳ môn học "Xử lý dữ liệu thông minh" của nhóm 5 người.
@@ -41,3 +43,12 @@ Kế hoạch thực hiện ứng dụng "Data Visualization" cho dự án cuối
    - Trang "Đánh giá": Hiển thị kết quả phân tích cảm xúc từ dữ liệu đánh giá.
      - Sử dụng các widget để người dùng lựa chọn thương hiệu, sản phẩm, khoảng thời gian đánh giá.
      - Hiển thị biểu đồ tỷ lệ cảm xúc, wordcloud từ khóa, và các ví dụ đánh giá điển hình.
+
+6. Tích hợp Chatbot từ OpenAI để phân tích dữ liệu tự động từ hình ảnh / kết quả mô hình OLS
+   - Phương pháp thực hiện:
+      - Xây dựng database chứa các hình ảnh trực quan, các kết quả phân tích dữ liệu của nhóm
+      - Thiết lập cơ chế truy vấn tăng cường (Retrieval-Augmented Generation) vào tệp database của nhóm khi nhận được câu hỏi từ người dùng
+      - Đưa các kết quả truy vấn bao gồm hình ảnh/kết quả phân tích dữ liệu của nhóm vào prompt của chatbot, kết hợp với câu hỏi từ người dùng để sinh ra câu trả lời từ chatbot
+   - Kết quả thực hiện:
+      - Đối với các trang "Giả thuyết", một kết quả phân tích từ chatbot sẽ được khởi tạo sẵn bởi nhóm tại đầu mục "Kết luận"
+      - Đối với tất cả các trang trong ứng dung, các hình ảnh được hiển thị tại trang đó có thể được Chatbot truy cập và giải thích, nhận xét thông qua câu hỏi được người dùng đặt ra tại thanh bên "Trợ lý"

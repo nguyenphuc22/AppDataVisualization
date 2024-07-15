@@ -1,0 +1,87 @@
+{
+    "products_multiAttributesImpact_clusterchart": {
+        "description": "Phân tích ảnh hưởng thương hiệu, địa điêm, mức giảm giá và điểm đánh giá lên số lượng sản phẩm bán ra: Biểu đồ phân tán biểu diễn số lượng bán ra của từng nhóm sản phẩm dựa trên các thuộc tính sản phẩm",
+        "content": "None",
+        "image_path": "ChatBotUtils/image/products_multiAttributesImpact_clusterchart.png"
+    },
+    "products_multiAttributesImpact_olsResult": {
+        "description": "Phân tích ảnh hưởng thương hiệu, địa điêm, mức giảm giá và điểm đánh giá lên số lượng sản phẩm bán ra: Kết quả mô hình OLS đánh giá sự ảnh hưởng của các thuộc tính sản phẩm đến số lượng bán ra sản phẩm",
+        "content": "products_multiAttributesImpact_olsResult",
+        "image_path": "None"
+    },
+    "products_priceImpact_clusterchart": {
+        "description": "Giả thuyết Giá bán có ảnh hưởng lớn đến số lượng bán ra hay không: Biểu đồ phân tán biểu diễn giá bán và số lượng bán ra của từng nhóm sản phẩm",
+        "content": "None",
+        "image_path": "ChatBotUtils/image/products_priceImpact_clusterchart.png"
+    },
+    "products_priceImpact_olsResult": {
+        "description": "Giả thuyết Giá bán có ảnh hưởng lớn đến số lượng bán ra hay không: Kết quả mô hình OLS đánh giá sự ảnh hưởng của giá bán đến số lượng bán ra sản phẩm",
+        "content": "products_priceImpact_olsResult",
+        "image_path": "None"
+    },
+    "reviews_sentiment_general": {
+        "description": "Phân tích đánh giá của khách hàng dựa trên cảm xúc: Biểu đồ cột biểu diễn tổng số lượng các nhãn cảm xúc trong tập dữ liệu đánh giá sản phẩm",
+        "content": "None",
+        "image_path": "ChatBotUtils/image/reviews_sentiment_general.png"
+    },
+    "reviews_rating_general": {
+        "description": "Phân tích đánh giá của khách hàng dựa trên cảm xúc: Biểu đồ cột biểu diễn tổng số lượng các nhãn đánh giá trong tập dữ liệu đánh giá sản phẩm",
+        "content": "None",
+        "image_path": "ChatBotUtils/image/reviews_rating_general.png"
+    },
+    "reviews_sentimentVsRating_percentage": {
+        "description": "Phân tích đánh giá của khách hàng dựa trên cảm xúc: Biểu đồ cột biểu diễn tỷ lệ giữa các nhãn cảm xúc trong mỗi nhãn đánh giá sản phẩm",
+        "content": "None",
+        "image_path": "ChatBotUtils/image/reviews_sentimentVsRating_percentage.png"
+    },
+    "reviews_sentimentTopWords_wordcloud": {
+        "description": "Phân tích đánh giá của khách hàng dựa trên cảm xúc: Biểu đồ đám mây từ cho các từ phổ biến trong các nhóm cảm xúc",
+        "content": "None",
+        "image_path": "ChatBotUtils/image/reviews_sentimentTopWords_wordcloud.png"
+    },
+    "reviews_sentimentVsBrands_percentage":{
+        "description": "Phân tích đánh giá của khách hàng dựa trên cảm xúc: Biểu đồ cột biểu diễn tỷ lệ giữa các nhãn cảm xúc cho từng nhãn hàng",
+        "content": "None",
+        "image_path": "ChatBotUtils/image/reviews_sentimentVsBrands_percentage.png"
+    },
+    "reviews_sentiments_generalContent": {
+        "description": "Phân tích đánh giá của khách hàng dựa trên cảm xúc: Nhận xét tổng quát về cảm xúc của người dùng trong tập dữ liệu đánh giá",
+        "content": "reviews_sentiments_generalContent",
+        "image_path": "None"
+    },
+    "reviews_keywords_wordclouds": {
+        "description": "Phân tích các từ khóa đặc điểm trong các đánh giá: Biểu đồ đám mây từ cho các từ khóa đánh giá sản phẩm",
+        "content": "None",
+        "image_path": "ChatBotUtils/image/reviews_keywords_wordclouds.png"
+    },
+    "reviews_keywords_columnschart": {
+        "description": "Phân tích các từ khóa đặc điểm trong các đánh giá: Biểu đồ cột biểu diễn tổng số lần xuất hiện của các nhóm từ khóa đánh giá sản phẩm",
+        "content": "None",
+        "image_path": "ChatBotUtils/image/reviews_keywords_wordclouds.png"
+    },
+    "reviews_keywordsVsBrand_columnschart": {
+        "description": "Phân tích các từ khóa đặc điểm trong các đánh giá: Biểu đồ cột biểu diễn tổng số lượng mỗi nhóm từ khóa cho từng nhãn hàng",
+        "content": "None",
+        "image_path": "ChatBotUtils/image/reviews_keywordsVsBrand_columnschart.png"
+    },
+    "reviews_keywordsVsBrand_pieschart": {
+        "description": "Phân tích các từ khóa đặc điểm trong các đánh giá: Biểu đồ tròn biểu diễn tỷ lệ giữa các nhóm từ khóa cho từng nhãn hàng",
+        "content": "None",
+        "image_path": "ChatBotUtils/image/reviews_keywordsVsBrand_pieschart.png"
+    },
+    "reviews_keywordsVsBrand_probabilitychart":{
+        "description": "Phân tích các từ khóa đặc điểm trong các đánh giá: Biểu đồ biểu diễn xác suất xuất hiện từ khóa trong mỗi bình luận cho từng nhãn hàng",
+        "content": "None",
+        "image_path": "ChatBotUtils/image/reviews_keywordsVsBrand_probabilitychart.png"
+    },
+    "reviews_keywords_generalContent": {
+        "description": "Phân tích các từ khóa đặc điểm trong các đánh giá: Nhận xét tổng quát về các từ khóa đánh giá sản phẩm trong tập dữ liệu đánh giá",
+        "content": "reviews_keywords_generalContent",
+        "image_path": "None"
+    },
+    "data_visuallization":{
+        "description": "Trực quan hoá dữ liệu: Hình ảnh trực quan hóa dữ liệu cho người dùng",
+        "content": "None",
+        "image_path": "ChatBotUtils/image/data_visuallization.png"
+    }
+}
