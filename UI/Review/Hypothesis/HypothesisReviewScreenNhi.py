@@ -132,23 +132,27 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     # Visualization 3: Biểu đồ cột Keywords Count by Brand and Feature
     st.subheader('3. Biểu đồ cột biểu diễn tổng số lượng mỗi nhóm từ khóa cho từng nhãn hàng')
     for feature, keywords in product_features.items():
-        df_new[feature + '_count'] = df_new['cleanedContent'].apply(lambda x: count_keywords(keywords, x))
+        df_new[feature + '_count'] = count_keywords_optimized(keywords, df_new['cleanedContent'])
 
-    plot_data = pd.DataFrame()
-
-    for feature, keywords in product_features.items():
+    plot_data_list = []
+    for feature in product_features.keys():
         temp_df = df_new.groupby('brandName')[feature + '_count'].sum().reset_index()
         temp_df['Feature'] = feature.capitalize()
         temp_df.rename(columns={feature + '_count': 'Keywords Count'}, inplace=True)
-        plot_data = pd.concat([plot_data, temp_df])
+        plot_data_list.append(temp_df)
 
-    plot_data.reset_index(drop=True, inplace=True)
+    plot_data = pd.concat(plot_data_list, ignore_index=True)
+
+    # Find the maximum value for the y-axis
+    max_y = plot_data['Keywords Count'].max()
+
+    # Plotting
     fig, ax = plt.subplots(figsize=(24, 12))
     sns.barplot(x='brandName', y='Keywords Count', hue='Feature', data=plot_data, alpha=0.8, ax=ax)
     plt.title('Keywords Count by Brand and Feature')
     plt.xlabel('Brand Name')
     plt.ylabel('Keywords Count')
-    plt.ylim(0, 2000)
+    plt.ylim(0, max_y + max_y * 0.1)  # Adding 10% margin to the max value
     plt.grid(axis='y')
     st.pyplot(fig)
 
@@ -260,7 +264,8 @@ def hypothesisReviewScreenNhi(strings: StringManager):
     feature_columns = df_binary.columns[1:]
     
     for col in feature_columns:
-        df_binary[col] = df_binary[col].apply(lambda x: 1 if x > 0 else 0)
+        df_binary.loc[df_binary[col] > 0, col] = 1
+        df_binary.loc[df_binary[col] <= 0, col] = 0
 
     brand_feature_counts = df_binary.groupby('brandName').sum()
     brand_comment_counts = df_binary.groupby('brandName').size()
@@ -352,4 +357,9 @@ def filter_words_by_features(word_counts_df, features_dict):
 def count_keywords(keywords, text):
     count = sum(1 for word in text if word in keywords)
     return count
+
+@st.cache_data
+def count_keywords_optimized(keywords, df_col):
+    keywords_set = set(keywords)
+    return df_col.apply(lambda x: sum(word in keywords_set for word in x))
 
