@@ -1,4 +1,27 @@
-import pandas as pd
+import os
+
+def initialize_folder_api():
+    directory = 'ChatBotUtils/image/'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    filename = "ChatBotUtils/privateInfo.py"
+
+    if not os.path.exists(filename):
+        api_key = input("Please enter your OpenAI API key: ").strip()
+        with open(filename, "w") as file:
+            file.write("OPENAI_API_KEY = \"{}\"\n".format(api_key))
+    else:
+        from ChatBotUtils.privateInfo import OPENAI_API_KEY
+        if OPENAI_API_KEY == "":
+            api_key = input("Please enter your OpenAI API key: ").strip()
+            with open(filename, "w") as file:
+                file.write("OPENAI_API_KEY = \"{}\"\n".format(api_key))
+        else:
+            print("OpenAI API key is already set in privateInfo.py.")
+
+initialize_folder_api()
+
 import streamlit as st
 
 from AppContext import AppContext
@@ -109,7 +132,7 @@ def main():
     elif appContext.titlePage == strings.get_string("review_hypothesis_title")[0]:
         hypothesisReviewScreenNhi(strings)
     print("===========================================")
-    
+
     chatbotView()
 
 if __name__ == "__main__":

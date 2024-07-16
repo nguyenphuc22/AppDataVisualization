@@ -4,6 +4,6 @@
 **/__pycache__/
 *.py[cod]
 *$py.class
-privateInfo.py
+ChatBotUtils/privateInfo.py
 database
-ChatBotUtils/image
+ChatBotUtils/image/
