@@ -30,7 +30,9 @@ Kế hoạch thực hiện ứng dụng "Data Visualization" cho dự án cuối
    - Mấy bạn làm phần này tự viết vào nhé
 
 4.2 Phân tích cảm xúc từ dữ liệu đánh giá
-   - Mấy bạn làm phần này tự viết vào nhé
+   - Sử dụng kỹ thuật NLP dựa trên thư viện underthesea để rút trích các từ, sau đó phân loại vào các cảm xúc.
+   - Trực quan hóa các yếu tố ảnh hưởng đến cảm xúc của khách hàng.
+   - Trích xuất các đặc trưng của sản phẩm, phân tích các yếu tố được khách hàng quan tâm nhiều.
    
 5. Xây dựng ứng dụng Streamlit
    - Thiết kế giao diện ứng dụng với Streamlit, tạo các trang (pages) cho từng chức năng chính.
