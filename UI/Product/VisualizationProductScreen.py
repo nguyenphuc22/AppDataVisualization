@@ -79,6 +79,7 @@ def visualizationProductScreen(strings: StringManager):
 
     plt.tight_layout()
     st.pyplot(fig)
+    plt.savefig('ChatBotUtils/image/data_visuallization.png')
 
     # Update AppContext based on the selected chart
     chart_summary = f"\nPhân tích {chart_type.lower()}:\n"

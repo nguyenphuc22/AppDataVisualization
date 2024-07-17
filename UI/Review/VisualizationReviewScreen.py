@@ -128,5 +128,6 @@ def visualizationReviewScreen(strings: StringManager):
         plt.tight_layout()
         st.pyplot(fig)
 
+    plt.savefig('ChatBotUtils/image/data_visuallization.png')
     # Cập nhật AppContext với phân tích biểu đồ
     app_context.hyphothesisContent += chart_summary

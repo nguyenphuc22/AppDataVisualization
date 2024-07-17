@@ -2,6 +2,7 @@ import streamlit as st
 from AppContext import AppContext
 from ChatBot import OpenAIChatbot
 from DataManager.ProductManager import ProductManager
+from FixedContent import FixedContent
 from String import StringManager
 from sklearn.preprocessing import LabelEncoder
 import matplotlib.pyplot as plt
@@ -54,6 +55,7 @@ def hypothesisProductScreenPhuc(strings: StringManager):
         axes[row, col].set_title(f"{var} vs Số lượng bán")
 
     plt.tight_layout()
+    plt.savefig('ChatBotUtils/image/products_multiAttributesImpact_clusterchart.png')
     st.pyplot(fig)
 
     # Kết luận và đề xuất dựa trên kết quả mô hình
@@ -79,6 +81,10 @@ def hypothesisProductScreenPhuc(strings: StringManager):
     appContext.hyphothesisContent = ', '.join(hypothesis_info["selectedVariables"]) + "\n```" + hypothesis_info["modelSummary"] + "```\nBiểu đồ phân tán"
     appContext.prompt = "Dựa vào kết quả OLS bên trên, hãy nhận xét OLS cho tôi về giả thuyết biến có ảnh hưởng đến số lượng bán hay không? Trả về dạng markdown."
 
+    fixedContent = FixedContent.get_instance()
+    fixedContent.products_multiAttributesImpact_olsResult = hypothesis_info["modelSummary"]
+
     response = openAi.generate_response(appContext)
 
-    st.markdown(response)
+    st.markdown(f"<div style='color: cyan; text-align: right;'>{strings.get_string('you')}: {appContext.prompt}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align: left;'>{strings.get_string('bot')}:\n\n {response}</div>", unsafe_allow_html=True)

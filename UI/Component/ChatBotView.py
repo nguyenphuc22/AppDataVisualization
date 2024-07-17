@@ -38,6 +38,6 @@ def chatbotView():
     # Display messages
     for message in st.session_state['messages']:
         if 'You' in message:
-            message_container.write(f"{strings.get_string('you')}: {message['You']}")
+            message_container.markdown(f"<div style='color: cyan; text-align: right;'>{strings.get_string('you')}: {message['You']}</div>", unsafe_allow_html=True)
         if 'Bot' in message:
-            message_container.write(f"{strings.get_string('bot')}: {message['Bot']}")
+            message_container.markdown(f"<div style='text-align: left;'>{strings.get_string('bot')}: {message['Bot']}</div>", unsafe_allow_html=True)
