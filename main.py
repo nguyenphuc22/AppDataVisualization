@@ -6,17 +6,16 @@ def initialize_folder_api():
         os.makedirs(directory)
 
     filename = "ChatBotUtils/privateInfo.py"
-
     if not os.path.exists(filename):
         api_key = input("Please enter your OpenAI API key: ").strip()
         with open(filename, "w") as file:
-            file.write("OPENAI_API_KEY = \"{}\"\n".format(api_key))
+            file.write(f"OPENAI_API_KEY = \"{api_key}\"\n")
     else:
         from ChatBotUtils.privateInfo import OPENAI_API_KEY
         if OPENAI_API_KEY == "":
             api_key = input("Please enter your OpenAI API key: ").strip()
             with open(filename, "w") as file:
-                file.write("OPENAI_API_KEY = \"{}\"\n".format(api_key))
+                file.write(f"OPENAI_API_KEY = \"{api_key}\"\n")
         else:
             print("OpenAI API key is already set in privateInfo.py.")
 
