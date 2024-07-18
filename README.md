@@ -2,6 +2,8 @@
 
 ## Cài đặt môi trường
 - Python 3.10.14
+- pip install -r ./requirements.txt
+
 ## Chạy sử dụng CLI
 - streamlit run main.py
 
@@ -12,7 +14,7 @@
 ## Kế hoạch
 Kế hoạch thực hiện ứng dụng "Data Visualization" cho dự án cuối kỳ môn học "Xử lý dữ liệu thông minh" của nhóm 5 người.
 
-1. Thu thập dữ liệu tự động ( Cái này làm sau cũng được, không gấp)
+1. Thu thập dữ liệu tự động
    - Tạo script Python để tự động thu thập dữ liệu sản phẩm và đánh giá mới từ Lazada theo lịch định kỳ (hàng ngày/giờ).
    - Lưu trữ dữ liệu mới vào cơ sở dữ liệu CSV.
 
