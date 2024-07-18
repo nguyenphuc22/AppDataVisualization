@@ -2,10 +2,10 @@
 
 ## Cài đặt môi trường
 - Python 3.10.14
-- pip install -r ./requirements.txt
+- `pip install -r ./requirements.txt`
 
 ## Chạy sử dụng CLI
-- streamlit run main.py
+- `streamlit run main.py`
 
 ## Về Chatbot Keys
 - Để có thể sử dụng chức năng liên quan đến chatbot, xin hãy nhập `OPENAI_API_KEY` khi ở console khi khởi động lần đầu, hoặc có thể cập nhật `OPENAI_API_KEY` tại file `ChatBotUtils/privateInfo.py`.
@@ -20,7 +20,7 @@ Kế hoạch thực hiện "Ứng dụng phân tích tự động tích hợp AI
 2. Phân tích và trực quan hóa dữ liệu sản phẩm
    - Xây dựng các hàm để tính toán và trực quan hóa các chỉ số như phân phối sản phẩm theo địa điểm, thương hiệu, đánh giá, giá bán, giảm giá, số lượng bán, v.v.
    - Tạo các biểu đồ tương tác sử dụng Plotly hoặc Altair để người dùng có thể thay đổi tham số và xem kết quả trực quan.
-   - Quá trình này sẽ được thực hiện khi người dùng truy cập vào trang "Sản phẩm -> Trực quan hoá", "Đánh giá -> người dùng tương tác với các điều khiển lọc và chọn dữ liệu trên giao diện.
+   - Quá trình này sẽ được thực hiện khi người dùng truy cập vào trang "Sản phẩm → Trực quan hoá", "Đánh giá → người dùng tương tác với các điều khiển lọc và chọn dữ liệu trên giao diện.
 
 3. Thực hiện phân tích tự động
   - Phân tích dùng OLS
