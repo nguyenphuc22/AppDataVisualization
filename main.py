@@ -1,9 +1,32 @@
-import pandas as pd
+import os
+
+def initialize_folder_api():
+    directory = 'ChatBotUtils/image/'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    filename = "ChatBotUtils/privateInfo.py"
+    if not os.path.exists(filename):
+        api_key = input("Please enter your OpenAI API key: ").strip()
+        with open(filename, "w") as file:
+            file.write(f"OPENAI_API_KEY = \"{api_key}\"\n")
+    else:
+        from ChatBotUtils.privateInfo import OPENAI_API_KEY
+        if OPENAI_API_KEY == "":
+            api_key = input("Please enter your OpenAI API key: ").strip()
+            with open(filename, "w") as file:
+                file.write(f"OPENAI_API_KEY = \"{api_key}\"\n")
+        else:
+            print("OpenAI API key is already set in privateInfo.py.")
+
+initialize_folder_api()
+
 import streamlit as st
 
 from AppContext import AppContext
 from DataManager.ProductManager import ProductManager
 from DataManager.ReviewManager import ReviewManager
+from FixedContent import FixedContent
 from String import StringManager
 from UI.Component.ChatBotView import chatbotView
 from UI.Component.UploadFilesView import uploadFilesView
@@ -15,15 +38,18 @@ from UI.Product.VisualizationProductScreen import visualizationProductScreen
 from UI.Review.Hypothesis.HypothesisReviewScreenNhi import hypothesisReviewScreenNhi
 from UI.Review.Hypothesis.HypothesisReviewScreenVien import hypothesisReviewScreenVien
 from UI.Review.VisualizationReviewScreen import visualizationReviewScreen
+from ChatBot import build_database
 
 # Create an instance of StringManager
 strings = StringManager.get_instance()
 productManager = ProductManager.get_instance()
 reviewManager = ReviewManager.get_instance()
 appContext = AppContext.get_instance()
+fixedContent = FixedContent.get_instance()
 
 def main():
     uploadFilesView(strings)
+    build_database()
 
     menu = st.sidebar.selectbox(
         strings.get_string("menu_title"),
@@ -105,7 +131,7 @@ def main():
     elif appContext.titlePage == strings.get_string("review_hypothesis_title")[0]:
         hypothesisReviewScreenNhi(strings)
     print("===========================================")
-    
+
     chatbotView()
 
 if __name__ == "__main__":

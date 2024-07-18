@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from collections import Counter
 
 from AppContext import AppContext
+from FixedContent import FixedContent
 from String import StringManager
 from DataManager.ReviewManager import ReviewManager
 from ChatBot import OpenAIChatbot
@@ -35,6 +36,7 @@ def hypothesisReviewScreenVien(strings: StringManager):
     sns.countplot(x="Sentiment", data=df_new, ax=ax, order=["Negative", "Neutral", "Positive"], palette="viridis")
     ax.set_xlabel("Cảm xúc", fontsize=12)
     ax.set_ylabel("Số lượng", fontsize=12)
+    plt.savefig('ChatBotUtils/image/reviews_sentiment_general.png')
     st.pyplot(fig)
 
     # Thêm nhận xét động cho trực quan 1
@@ -55,6 +57,7 @@ def hypothesisReviewScreenVien(strings: StringManager):
     sns.countplot(x="rating", data=df_new, ax=ax, palette="viridis")
     ax.set_xlabel("Đánh giá", fontsize=12)
     ax.set_ylabel("Số lượng", fontsize=12)
+    plt.savefig('ChatBotUtils/image/reviews_rating_general.png')
     st.pyplot(fig)
 
     # Thêm nhận xét động cho trực quan 2
@@ -79,6 +82,7 @@ def hypothesisReviewScreenVien(strings: StringManager):
     percentstandardize_barplot(x="rating", y="Percentage", hue="Sentiment", data=df_new, ax=ax)
     ax.set_xlabel("Đánh giá")
     ax.set_ylabel("Phần trăm %")
+    plt.savefig('ChatBotUtils/image/reviews_sentimentVsRating_percentage.png')
     st.pyplot(fig)
 
     # Thêm nhận xét động như trực quan 3
@@ -141,6 +145,20 @@ def hypothesisReviewScreenVien(strings: StringManager):
         # Lấy top 20 từ tiêu cực
         top_negative_words = get_top_words(review_manager.negative_words)
 
+    # Create plots for save
+    fig, axs = plt.subplots(2, 2, figsize=(20, 12))
+    axs[0, 0].imshow(positive_wordcloud, interpolation='bilinear')                  # Positive wordcloud
+    axs[0, 0].set_title('Các từ xuất hiện nhiều với cảm xúc tích cực')
+    axs[0, 0].axis('off')
+    plot_top_words(df_new, review_manager.positive_words, axs[0, 1], color='green') # Positive top words    
+    axs[1, 0].imshow(negative_wordcloud, interpolation='bilinear')                  # Negative wordcloud
+    axs[1, 0].set_title('Các từ xuất hiện nhiều với cảm xúc tiêu cực')
+    axs[1, 0].axis('off')
+    plot_top_words(df_new, review_manager.negative_words, axs[1, 1], color='red')  # Negative top words
+    # Save the combined figure as a PNG file
+    plt.tight_layout()
+    plt.savefig('ChatBotUtils/image/reviews_sentimentTopWords_wordcloud.png')
+
     positive_comments = [word for word in review_manager.positive_words if word in top_positive_words]
     negative_comments = [word for word in review_manager.negative_words if word in top_negative_words]
 
@@ -165,6 +183,7 @@ def hypothesisReviewScreenVien(strings: StringManager):
     ax.set_ylabel('Tỷ lệ phần trăm (%)')
     plt.xticks(rotation=45)
     ax.legend(title='Sentiment', labels=['Negative', 'Positive'])
+    plt.savefig('ChatBotUtils/image/reviews_sentimentVsBrands_percentage.png')
     st.pyplot(fig)
 
 
@@ -255,9 +274,13 @@ def hypothesisReviewScreenVien(strings: StringManager):
     """)
     appContext.hyphothesisContent = hpsContent
     appContext.prompt = "Hãy nhận xét giả thuyết phân tích cảm xúc của người dùng có tác động như thế nào đến đánh giá và các nhãn hàng lớn trên thế giới cho tôi dạng markdown"
-    response = openAi.generate_response(appContext)
 
-    st.markdown(response)
+    fixedContent = FixedContent.get_instance()
+    fixedContent.reviews_sentiments_generalContent = hpsContent
+    
+    response = openAi.generate_response(appContext)
+    st.markdown(f"<div style='color: cyan; text-align: right;'>{strings.get_string('you')}: {appContext.prompt}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align: left;'>{strings.get_string('bot')}:\n\n {response}</div>", unsafe_allow_html=True)
 
 # Các hàm hỗ trợ 
 def percentstandardize_barplot(x, y, hue, data, ax=None, order=None):

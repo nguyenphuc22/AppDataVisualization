@@ -8,6 +8,7 @@ from statsmodels.formula.api import ols
 from DataManager.ProductManager import ProductManager
 from AppContext import AppContext
 from ChatBot import OpenAIChatbot
+from FixedContent import FixedContent
 
 def hypothesisProductScreenThanh(strings: StringManager):
     print("Hypothesis Product Screen Thanh Entry")
@@ -45,6 +46,7 @@ def hypothesisProductScreenThanh(strings: StringManager):
 
     plt.tight_layout()
 
+    plt.savefig('ChatBotUtils/image/products_priceImpact_clusterchart.png')
     st.pyplot(fig)
 
     # Kết luận và đề xuất dựa trên kết quả mô hình
@@ -60,6 +62,10 @@ def hypothesisProductScreenThanh(strings: StringManager):
 
     appContext.hyphothesisContent = hpsContent
     appContext.prompt = "Dựa vào kết quả OLS bên trên, hãy nhận xét và đưa ra kết luận cho tôi, ở định dạng markdown"
-    response = openAi.generate_response(appContext)
 
-    st.markdown(response)
+    fixedContent = FixedContent.get_instance()
+    fixedContent.products_priceImpact_olsResult = hpsContent
+
+    response = openAi.generate_response(appContext)
+    st.markdown(f"<div style='color: cyan; text-align: right;'>{strings.get_string('you')}: {appContext.prompt}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align: left;'>{strings.get_string('bot')}:\n\n {response}</div>", unsafe_allow_html=True)
